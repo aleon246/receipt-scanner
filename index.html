@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V7</title>
+<style>
+:root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}.stage{min-height:530px;border:2px dashed var(--line);border-radius:15px;background:#02061799;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.stage label{position:absolute;inset:0;cursor:pointer}.stage input{display:none}.empty{text-align:center;color:var(--muted);padding:25px}.empty b{display:block;color:white;font-size:18px;margin:12px}.preview{display:none;max-width:100%;max-height:680px;object-fit:contain}.preview.show{display:block}.side{display:flex;flex-direction:column;gap:14px}.title{font-size:18px;font-weight:800;margin:2px 0 16px}.btn{width:100%;border:0;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#020617}.green{background:var(--green);color:#020617}.outline{background:transparent;border:1px solid var(--line);color:white}.controls{margin-top:18px;padding-top:16px;border-top:1px solid #1e293b}.control{margin-bottom:17px}.row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.range{width:100%;accent-color:var(--cyan)}.legend{font-size:11px;color:#64748b;display:flex;justify-content:space-between}.hint{font-size:12px;line-height:1.65}.check{display:flex;align-items:center;gap:9px;font-size:14px;margin:4px 0 18px}.check input{width:18px;height:18px;accent-color:var(--cyan)}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(850px,calc(100% - 28px));background:#0f172af2;border:1px solid var(--line);border-radius:14px;padding:12px 14px;z-index:10}.statusline{display:flex;gap:9px;align-items:center;font-size:13px}.dot{width:10px;height:10px;border-radius:50%;background:var(--green)}.dot.busy{background:var(--cyan);animation:pulse 1s infinite}.bar{height:6px;background:#1e293b;border-radius:8px;overflow:hidden;margin-top:8px;display:none}.bar.show{display:block}.fill{height:100%;background:var(--cyan);width:0}.foot{text-align:center;color:#64748b;font-size:11px;line-height:1.6}@keyframes pulse{50%{opacity:.35}}@media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
+</style></head>
+<body><main class="app">
+<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V7</div><h1>レシート・領収書スキャナー</h1><p class="sub">台形補正、余白カット、リアルタイム傾き調整、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
+<div class="grid"><section class="card"><div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>写真アプリから画像を選択</b><span>iPhoneの写真アプリに保存済みの画像を選択してください</span></div><img id="preview" class="preview" alt="補正プレビュー"></div><canvas id="sourceCanvas" hidden></canvas><canvas id="baseCanvas" hidden></canvas><canvas id="workCanvas" hidden></canvas><canvas id="outputCanvas" hidden></canvas></section>
+<aside class="side"><section class="card"><h2 class="title">▣ 画像補正</h2><button id="auto" class="btn primary" disabled>✨ 自動スキャン</button>
+<div class="controls"><p class="hint">各スライダーの変更は、約0.15秒後にプレビューへ自動反映されます。</p>
+<div class="control"><div class="row"><span>回転</span><span id="rotationValue">0°</span></div><input id="rotation" class="range" type="range" min="-15" max="15" step="0.5" value="0"><div class="legend"><span>左回転</span><span>右回転</span></div></div>
+<div class="control"><div class="row"><span>水平方向の傾き</span><span id="horizontalValue">0</span></div><input id="horizontal" class="range" type="range" min="-25" max="25" step="1" value="0"><div class="legend"><span>下辺を広げる</span><span>上辺を広げる</span></div></div>
+<div class="control"><div class="row"><span>垂直方向の傾き</span><span id="verticalValue">0</span></div><input id="vertical" class="range" type="range" min="-25" max="25" step="1" value="0"><div class="legend"><span>右辺を広げる</span><span>左辺を広げる</span></div></div>
+<div class="control"><div class="row"><span>コントラスト</span><span id="contrastValue">100%</span></div><input id="contrast" class="range" type="range" min="70" max="170" step="1" value="100"></div>
+<label class="check"><input id="grayscale" type="checkbox">白黒化</label>
+<button id="resetAdjust" class="btn outline" disabled>調整値をリセット</button></div></section>
+<button id="pdf" class="btn green" disabled>⇩ PDF保存</button><button id="resetAll" class="btn outline">↻ 画像と結果をリセット</button><p class="foot">初回アクセス時にアプリ本体を端末へ保存します。以後はオフラインで利用できます。画像はサーバーへ送信しません。</p></aside></div></main>
+<div class="status"><div class="statusline"><span id="dot" class="dot"></span><span id="message">画像を選択してください</span></div><div id="bar" class="bar"><div id="fill" class="fill"></div></div></div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),E={file:$('file'),drop:$('drop'),empty:$('empty'),preview:$('preview'),source:$('sourceCanvas'),base:$('baseCanvas'),work:$('workCanvas'),output:$('outputCanvas'),auto:$('auto'),pdf:$('pdf'),resetAdjust:$('resetAdjust'),resetAll:$('resetAll'),rotation:$('rotation'),horizontal:$('horizontal'),vertical:$('vertical'),contrast:$('contrast'),grayscale:$('grayscale'),dot:$('dot'),message:$('message'),bar:$('bar'),fill:$('fill')};
+let sourceUrl='',currentUrl='',busy=false,cvReadyPromise=null,renderTimer=null,renderToken=0;
+const loadScript=(src,name)=>new Promise((resolve,reject)=>{if(window[name])return resolve(window[name]);let s=document.querySelector(`script[src="${src}"]`);if(!s){s=document.createElement('script');s.src=src;s.async=true;document.head.appendChild(s)}s.addEventListener('load',()=>resolve(window[name]),{once:true});s.addEventListener('error',()=>reject(new Error(src+' を読み込めません')),{once:true})});
+async function getCv(){if(cvReadyPromise)return cvReadyPromise;cvReadyPromise=(async()=>{await loadScript('./libs/opencv.js','cv');let c=window.cv;if(c&&typeof c.then==='function')c=await c;for(let i=0;i<600;i++){c=window.cv;if(c&&typeof c.then==='function')c=await c;if(c?.Mat&&c?.warpPerspective)return c;await new Promise(r=>setTimeout(r,100))}throw new Error('OpenCVの初期化が完了しません')})().catch(e=>{cvReadyPromise=null;throw e});return cvReadyPromise}
+function status(msg,isBusy=false,p=0){busy=isBusy;E.message.textContent=msg;E.dot.classList.toggle('busy',isBusy);E.bar.classList.toggle('show',isBusy);E.fill.style.width=p+'%';buttons()}
+function buttons(){const ready=!!sourceUrl;E.auto.disabled=!ready||busy;E.pdf.disabled=!currentUrl||busy;E.resetAdjust.disabled=!ready||busy}
+function show(url){E.preview.src=url;E.preview.classList.add('show');E.empty.hidden=true;currentUrl=url;buttons()}
+function resetValues(){E.rotation.value=0;E.horizontal.value=0;E.vertical.value=0;E.contrast.value=100;E.grayscale.checked=false;updateLabels()}
+function updateLabels(){$('rotationValue').textContent=E.rotation.value+'°';$('horizontalValue').textContent=E.horizontal.value;$('verticalValue').textContent=E.vertical.value;$('contrastValue').textContent=E.contrast.value+'%'}
+function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
+async function handle(file){if(!file?.type?.startsWith('image/'))return;if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl=URL.createObjectURL(file);currentUrl='';resetValues();const img=await loadImage(sourceUrl),limit=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)?1400:1800,scale=Math.min(1,limit/Math.max(img.naturalWidth,img.naturalHeight));E.source.width=Math.round(img.naturalWidth*scale);E.source.height=Math.round(img.naturalHeight*scale);E.source.getContext('2d').drawImage(img,0,0,E.source.width,E.source.height);E.base.width=E.source.width;E.base.height=E.source.height;E.base.getContext('2d').drawImage(E.source,0,0);show(sourceUrl);status('画像を読み込みました。自動スキャンまたは手動調整ができます')}
+E.file.addEventListener('change',e=>handle(e.target.files[0]));['dragenter','dragover'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor='#22d3ee'}));['dragleave','drop'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor=''}));E.drop.addEventListener('drop',e=>handle(e.dataTransfer.files[0]));
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);function order(p){const y=[...p].sort((a,b)=>a.y-b.y),t=y.slice(0,2).sort((a,b)=>a.x-b.x),d=y.slice(2).sort((a,b)=>a.x-b.x);return[t[0],t[1],d[1],d[0]]}
+E.auto.addEventListener('click',async()=>{const mats=[];status('ローカルOpenCVを準備中',true,8);try{const cv=await getCv();status('レシートの四隅を検出中',true,25);const src=cv.imread(E.source),gray=new cv.Mat(),blur=new cv.Mat(),edges=new cv.Mat(),kernel=cv.Mat.ones(5,5,cv.CV_8U),contours=new cv.MatVector(),hier=new cv.Mat();mats.push(src,gray,blur,edges,kernel,contours,hier);cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);cv.GaussianBlur(gray,blur,new cv.Size(5,5),0);cv.Canny(blur,edges,40,140);cv.morphologyEx(edges,edges,cv.MORPH_CLOSE,kernel);cv.findContours(edges,contours,hier,cv.RETR_LIST,cv.CHAIN_APPROX_SIMPLE);let best=null,area=0,min=src.rows*src.cols*.1;for(let i=0;i<contours.size();i++){const c=contours.get(i),a=new cv.Mat();cv.approxPolyDP(c,a,.02*cv.arcLength(c,true),true);const ar=Math.abs(cv.contourArea(a));if(a.rows===4&&ar>min&&ar>area&&cv.isContourConvex(a)){best?.delete();best=a.clone();area=ar}a.delete();c.delete()}let result=src,found=false;if(best){mats.push(best);const raw=[];for(let i=0;i<4;i++){const p=best.intPtr(i,0);raw.push({x:p[0],y:p[1]})}const[tl,tr,br,bl]=order(raw),w=Math.round(Math.max(dist(tl,tr),dist(bl,br))),h=Math.round(Math.max(dist(tl,bl),dist(tr,br))),sp=cv.matFromArray(4,1,cv.CV_32FC2,[tl.x,tl.y,tr.x,tr.y,br.x,br.y,bl.x,bl.y]),dp=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]),m=cv.getPerspectiveTransform(sp,dp),warped=new cv.Mat();mats.push(sp,dp,m,warped);cv.warpPerspective(src,warped,m,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));result=warped;found=true}cv.imshow(E.base,result);resetValues();await renderAdjustments(true);status(found?'自動スキャンが完了しました':'四隅を検出できなかったため、画像全体を調整対象にしました')}catch(e){console.error(e);status('自動スキャンに失敗しました: '+e.message)}finally{mats.forEach(m=>{try{m?.delete?.()}catch{}});busy=false;buttons()}});
+async function renderAdjustments(silent=false){
+  if(!sourceUrl)return;
+  const token=++renderToken,mats=[];
+  try{
+    const cv=await getCv();
+    if(token!==renderToken)return;
+    const base=cv.imread(E.base);mats.push(base);
+    const w=base.cols,h=base.rows;
+
+    // 回転後も自動スキャン直後の幅・高さを維持する
+    const deg=Number(E.rotation.value);
+    const center=new cv.Point(w/2,h/2);
+    const rot=cv.getRotationMatrix2D(center,deg,1);
+    const rotated=new cv.Mat();mats.push(rot,rotated);
+    cv.warpAffine(base,rotated,rot,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
+
+    // 「狭める」のではなく、選択した辺をキャンバス全幅・全高へ広げる。
+    // 出力先は常に w x h のため、画像サイズは変化しない。
+    const horizontal=Number(E.horizontal.value)/25;
+    const vertical=Number(E.vertical.value)/25;
+    const maxInsetX=w*0.22;
+    const maxInsetY=h*0.22;
+    let stl={x:0,y:0},str={x:w-1,y:0},sbr={x:w-1,y:h-1},sbl={x:0,y:h-1};
+
+    if(horizontal>0){
+      // 上辺を広げる
+      stl.x=maxInsetX*horizontal;
+      str.x=w-1-maxInsetX*horizontal;
+    }else if(horizontal<0){
+      // 下辺を広げる
+      sbl.x=maxInsetX*(-horizontal);
+      sbr.x=w-1-maxInsetX*(-horizontal);
+    }
+
+    if(vertical>0){
+      // 左辺を広げる
+      stl.y=maxInsetY*vertical;
+      sbl.y=h-1-maxInsetY*vertical;
+    }else if(vertical<0){
+      // 右辺を広げる
+      str.y=maxInsetY*(-vertical);
+      sbr.y=h-1-maxInsetY*(-vertical);
+    }
+
+    const srcPts=cv.matFromArray(4,1,cv.CV_32FC2,[stl.x,stl.y,str.x,str.y,sbr.x,sbr.y,sbl.x,sbl.y]);
+    const dstPts=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]);
+    const matrix=cv.getPerspectiveTransform(srcPts,dstPts);
+    const perspective=new cv.Mat();
+    const finalMat=new cv.Mat();
+    mats.push(srcPts,dstPts,matrix,perspective,finalMat);
+    cv.warpPerspective(rotated,perspective,matrix,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
+    cv.convertScaleAbs(perspective,finalMat,Number(E.contrast.value)/100,0);
+
+    if(E.grayscale.checked){
+      const gray=new cv.Mat();mats.push(gray);
+      cv.cvtColor(finalMat,gray,cv.COLOR_RGBA2GRAY);
+      gray.copyTo(finalMat);
+    }
+    if(token!==renderToken)return;
+    cv.imshow(E.output,finalMat);
+    show(E.output.toDataURL('image/jpeg',.95));
+    if(!silent)status('調整結果をリアルタイム反映しました（画像サイズ維持）');
+  }catch(e){
+    console.error(e);
+    if(!silent)status('調整表示に失敗しました: '+e.message);
+  }finally{
+    mats.forEach(m=>{try{m?.delete?.()}catch{}});
+  }
+}
+function schedule(){updateLabels();clearTimeout(renderTimer);renderTimer=setTimeout(()=>renderAdjustments(),150)};[E.rotation,E.horizontal,E.vertical,E.contrast].forEach(x=>x.addEventListener('input',schedule));E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
+E.pdf.addEventListener('click',async()=>{status('PDFを作成中',true,20);try{await loadScript('./libs/pdf-lib.min.js','PDFLib');const pdf=await PDFLib.PDFDocument.create(),bytes=await fetch(currentUrl).then(r=>r.arrayBuffer());let im;try{im=await pdf.embedJpg(bytes)}catch{im=await pdf.embedPng(bytes)}const pw=595.28,ph=841.89,r=Math.min(pw/im.width,ph/im.height),w=im.width*r,h=im.height*r,page=pdf.addPage([pw,ph]);page.drawImage(im,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h});const out=await pdf.save(),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/pdf'}));a.download=`receipt_${new Date().toISOString().slice(0,10)}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status('PDFを書き出しました')}catch(e){status('PDF作成に失敗しました: '+e.message)}finally{busy=false;buttons()}});
+E.resetAll.addEventListener('click',()=>{if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl='';currentUrl='';E.preview.removeAttribute('src');E.preview.classList.remove('show');E.empty.hidden=false;E.file.value='';resetValues();status('画像を選択してください')});if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const registration=await navigator.serviceWorker.register('./service-worker.js');await navigator.serviceWorker.ready;if(navigator.onLine)status('PWAの準備が完了しました。写真アプリから画像を選択できます');else status('オフラインで起動しました')}catch(e){console.error(e);status('PWA登録に失敗しました。HTTPSで公開されているか確認してください')}})}else{status('このブラウザはオフラインPWAに対応していません')}window.addEventListener('offline',()=>status('オフラインになりました。保存済み機能は利用できます'));window.addEventListener('online',()=>status('オンラインに戻りました'));updateLabels();buttons();
+</script></body></html>
