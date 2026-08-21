@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V7</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V8</title>
 <style>
 :root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}.stage{min-height:530px;border:2px dashed var(--line);border-radius:15px;background:#02061799;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.stage label{position:absolute;inset:0;cursor:pointer}.stage input{display:none}.empty{text-align:center;color:var(--muted);padding:25px}.empty b{display:block;color:white;font-size:18px;margin:12px}.preview{display:none;max-width:100%;max-height:680px;object-fit:contain}.preview.show{display:block}.side{display:flex;flex-direction:column;gap:14px}.title{font-size:18px;font-weight:800;margin:2px 0 16px}.btn{width:100%;border:0;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#020617}.green{background:var(--green);color:#020617}.outline{background:transparent;border:1px solid var(--line);color:white}.controls{margin-top:18px;padding-top:16px;border-top:1px solid #1e293b}.control{margin-bottom:17px}.row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.range{width:100%;accent-color:var(--cyan)}.legend{font-size:11px;color:#64748b;display:flex;justify-content:space-between}.hint{font-size:12px;line-height:1.65}.check{display:flex;align-items:center;gap:9px;font-size:14px;margin:4px 0 18px}.check input{width:18px;height:18px;accent-color:var(--cyan)}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(850px,calc(100% - 28px));background:#0f172af2;border:1px solid var(--line);border-radius:14px;padding:12px 14px;z-index:10}.statusline{display:flex;gap:9px;align-items:center;font-size:13px}.dot{width:10px;height:10px;border-radius:50%;background:var(--green)}.dot.busy{background:var(--cyan);animation:pulse 1s infinite}.bar{height:6px;background:#1e293b;border-radius:8px;overflow:hidden;margin-top:8px;display:none}.bar.show{display:block}.fill{height:100%;background:var(--cyan);width:0}.foot{text-align:center;color:#64748b;font-size:11px;line-height:1.6}@keyframes pulse{50%{opacity:.35}}@media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
 </style></head>
 <body><main class="app">
-<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V7</div><h1>レシート・領収書スキャナー</h1><p class="sub">台形補正、余白カット、リアルタイム傾き調整、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
+<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V8</div><h1>レシート・領収書スキャナー</h1><p class="sub">台形補正、余白カット、リアルタイム傾き調整、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
 <div class="grid"><section class="card"><div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>写真アプリから画像を選択</b><span>iPhoneの写真アプリに保存済みの画像を選択してください</span></div><img id="preview" class="preview" alt="補正プレビュー"></div><canvas id="sourceCanvas" hidden></canvas><canvas id="baseCanvas" hidden></canvas><canvas id="workCanvas" hidden></canvas><canvas id="outputCanvas" hidden></canvas></section>
 <aside class="side"><section class="card"><h2 class="title">▣ 画像補正</h2><button id="auto" class="btn primary" disabled>✨ 自動スキャン</button>
 <div class="controls"><p class="hint">各スライダーの変更は、約0.15秒後にプレビューへ自動反映されます。</p>
@@ -104,6 +104,59 @@ async function renderAdjustments(silent=false){
   }
 }
 function schedule(){updateLabels();clearTimeout(renderTimer);renderTimer=setTimeout(()=>renderAdjustments(),150)};[E.rotation,E.horizontal,E.vertical,E.contrast].forEach(x=>x.addEventListener('input',schedule));E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
-E.pdf.addEventListener('click',async()=>{status('PDFを作成中',true,20);try{await loadScript('./libs/pdf-lib.min.js','PDFLib');const pdf=await PDFLib.PDFDocument.create(),bytes=await fetch(currentUrl).then(r=>r.arrayBuffer());let im;try{im=await pdf.embedJpg(bytes)}catch{im=await pdf.embedPng(bytes)}const pw=595.28,ph=841.89,r=Math.min(pw/im.width,ph/im.height),w=im.width*r,h=im.height*r,page=pdf.addPage([pw,ph]);page.drawImage(im,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h});const out=await pdf.save(),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/pdf'}));a.download=`receipt_${new Date().toISOString().slice(0,10)}.pdf`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);status('PDFを書き出しました')}catch(e){status('PDF作成に失敗しました: '+e.message)}finally{busy=false;buttons()}});
+E.pdf.addEventListener('click',async()=>{
+  status('A4・300dpiのPDFを作成中',true,20);
+  try{
+    await loadScript('./libs/pdf-lib.min.js','PDFLib');
+    const source=await loadImage(currentUrl);
+
+    // A4縦 300dpi = 2480 x 3508 px
+    const A4_PX_W=2480,A4_PX_H=3508;
+    // ISO A4をPDFポイントへ換算したサイズ
+    const A4_PT_W=595.28,A4_PT_H=841.89;
+    const MARGIN_PX=118; // 約10mm（300dpi）
+
+    const pageCanvas=document.createElement('canvas');
+    pageCanvas.width=A4_PX_W;
+    pageCanvas.height=A4_PX_H;
+    const ctx=pageCanvas.getContext('2d',{alpha:false});
+    ctx.fillStyle='#ffffff';
+    ctx.fillRect(0,0,A4_PX_W,A4_PX_H);
+
+    const usableW=A4_PX_W-MARGIN_PX*2;
+    const usableH=A4_PX_H-MARGIN_PX*2;
+    const ratio=Math.min(usableW/source.naturalWidth,usableH/source.naturalHeight);
+    const drawW=Math.max(1,Math.round(source.naturalWidth*ratio));
+    const drawH=Math.max(1,Math.round(source.naturalHeight*ratio));
+    const drawX=Math.round((A4_PX_W-drawW)/2);
+    const drawY=Math.round((A4_PX_H-drawH)/2);
+    ctx.imageSmoothingEnabled=true;
+    ctx.imageSmoothingQuality='high';
+    ctx.drawImage(source,drawX,drawY,drawW,drawH);
+
+    const jpgData=pageCanvas.toDataURL('image/jpeg',0.96);
+    const jpgBytes=await fetch(jpgData).then(r=>r.arrayBuffer());
+    const pdf=await PDFLib.PDFDocument.create();
+    const image=await pdf.embedJpg(jpgBytes);
+    const page=pdf.addPage([A4_PT_W,A4_PT_H]);
+    page.drawImage(image,{x:0,y:0,width:A4_PT_W,height:A4_PT_H});
+    pdf.setTitle('Receipt Scan A4 300dpi');
+    pdf.setSubject('A4 300dpi equivalent raster image');
+
+    const out=await pdf.save();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([out],{type:'application/pdf'}));
+    a.download=`receipt_A4_300dpi_${new Date().toISOString().slice(0,10)}.pdf`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    status('A4・300dpi相当（2480×3508px）のPDFを書き出しました');
+  }catch(e){
+    console.error(e);
+    status('PDF作成に失敗しました: '+e.message);
+  }finally{
+    busy=false;
+    buttons();
+  }
+});
 E.resetAll.addEventListener('click',()=>{if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl='';currentUrl='';E.preview.removeAttribute('src');E.preview.classList.remove('show');E.empty.hidden=false;E.file.value='';resetValues();status('画像を選択してください')});if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const registration=await navigator.serviceWorker.register('./service-worker.js');await navigator.serviceWorker.ready;if(navigator.onLine)status('PWAの準備が完了しました。写真アプリから画像を選択できます');else status('オフラインで起動しました')}catch(e){console.error(e);status('PWA登録に失敗しました。HTTPSで公開されているか確認してください')}})}else{status('このブラウザはオフラインPWAに対応していません')}window.addEventListener('offline',()=>status('オフラインになりました。保存済み機能は利用できます'));window.addEventListener('online',()=>status('オンラインに戻りました'));updateLabels();buttons();
 </script></body></html>
