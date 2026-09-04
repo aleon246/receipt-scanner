@@ -110,7 +110,7 @@ E.pdf.addEventListener('click',async()=>{
     await loadScript('./libs/pdf-lib.min.js','PDFLib');
     const source=await loadImage(currentUrl);
 
-    // A4縦 350dpi = 2480 x 3508 px
+    // A4縦 350dpi = 2894 × 4093 px
     const A4_PX_W=2894,A4_PX_H=4093;
     // ISO A4をPDFポイントへ換算したサイズ
     const A4_PT_W=595.28,A4_PT_H=841.89;
