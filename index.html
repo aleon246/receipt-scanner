@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="レシートスキャナー">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <title>レシートスキャナー PWA V13</title>
+  <title>レシートスキャナー PWA V14</title>
   <style>
     /* 配色ルール 60-30-10
        60%（ベース）：--bg / --panel …ネイビー（パレットの #1E293B とその濃淡）
@@ -33,7 +33,15 @@
 
     body {
       margin: 0;
-      background: var(--bg);
+      min-height: 100vh;
+      /* 背景：ネイビーの上に、パレットの青・青緑・ティールの光をぼかして重ねる */
+      background:
+        radial-gradient(900px 600px at 0% 0%, #2563eb40, transparent 60%),
+        radial-gradient(700px 500px at 100% 10%, #0891b233, transparent 60%),
+        radial-gradient(800px 600px at 80% 100%, #0d948830, transparent 60%),
+        linear-gradient(160deg, #0f172a 0%, #111c33 50%, #0b1220 100%);
+      background-attachment: fixed;
+      background-color: var(--bg);
       color: var(--text);
       font-family: "Yu Gothic UI", Meiryo, system-ui, sans-serif
     }
@@ -94,8 +102,10 @@
     }
 
     .card {
-      background: var(--panel);
-      border: 1px solid #334155;
+      background: #1e293bcc;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border: 1px solid #ffffff14;
       border-radius: 18px;
       padding: 16px;
       box-shadow: 0 10px 30px #0006
@@ -302,8 +312,10 @@
     }
 
     .status {
-      background: #1e293b;
-      border: 1px solid var(--line);
+      background: #1e293bcc;
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border: 1px solid #ffffff14;
       border-radius: 14px;
       padding: 12px 14px;
       box-shadow: 0 8px 24px #0006
@@ -458,7 +470,7 @@
   <main class="app">
     <header class="head">
       <div>
-        <div class="eyebrow">LOCAL RECEIPT SCANNER PWA V13</div>
+        <div class="eyebrow">LOCAL RECEIPT SCANNER PWA V14</div>
         <h1>レシート・領収書スキャナー</h1>
       </div>
     </header>
@@ -719,7 +731,7 @@
     E.tabEdit.addEventListener('click', () => setView('edit'));
     E.tabResult.addEventListener('click', () => setView('result'));
     E.applyCorners.addEventListener('click', async () => {status('補正中', true, 50); const ok = await applyCorners(true); busy = false; if (ok) {setView('result'); status('四隅の位置で補正しました。再度補正するには「① 四隅を調整」を押してください。')} else status('補正できませんでした。四隅の位置を確認してください')});
-    E.fullCorners.addEventListener('click', () => {corners = fullCorners(); requestDraw(); buttons(); applyCorners(true).then(() => status('四隅を画像全体に戻しました'))});
+    E.fullCorners.addEventListener('click', () => {corners = fullCorners(); drag = null; setView('edit'); requestDraw(); buttons(); applyCorners(true).then(() => status('四隅を画像全体に戻しました。●をドラッグして角に合わせてください'))});
 
     /* ===================== PDF保存（V10と同じ） ===================== */
     function defaultPdfName() {const d = new Date(), y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0'); return `領収書_${y}-${m}-${day}`}
