@@ -1,149 +1,216 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V10</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V11</title>
 <style>
-:root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}.stage{min-height:530px;border:2px dashed var(--line);border-radius:15px;background:#02061799;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.stage label{position:absolute;inset:0;cursor:pointer}.stage input{display:none}.empty{text-align:center;color:var(--muted);padding:25px}.empty b{display:block;color:white;font-size:18px;margin:12px}.preview{display:none;max-width:100%;max-height:680px;object-fit:contain}.preview.show{display:block}.side{display:flex;flex-direction:column;gap:14px}.title{font-size:18px;font-weight:800;margin:2px 0 16px}.btn{width:100%;border:0;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#020617}.green{background:var(--green);color:#020617}.outline{background:transparent;border:1px solid var(--line);color:white}.controls{margin-top:18px;padding-top:16px;border-top:1px solid #1e293b}.control{margin-bottom:17px}.row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.range{width:100%;accent-color:var(--cyan)}.legend{font-size:11px;color:#64748b;display:flex;justify-content:space-between}.hint{font-size:12px;line-height:1.65}.check{display:flex;align-items:center;gap:9px;font-size:14px;margin:4px 0 18px}.check input{width:18px;height:18px;accent-color:var(--cyan)}.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(850px,calc(100% - 28px));background:#0f172af2;border:1px solid var(--line);border-radius:14px;padding:12px 14px;z-index:10}.statusline{display:flex;gap:9px;align-items:center;font-size:13px}.dot{width:10px;height:10px;border-radius:50%;background:var(--green)}.dot.busy{background:var(--cyan);animation:pulse 1s infinite}.bar{height:6px;background:#1e293b;border-radius:8px;overflow:hidden;margin-top:8px;display:none}.bar.show{display:block}.fill{height:100%;background:var(--cyan);width:0}.foot{text-align:center;color:#64748b;font-size:11px;line-height:1.6}.modal{position:fixed;inset:0;background:#020617cc;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.dialog{width:min(460px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 24px 70px #000a}.dialog h2{margin:0 0 8px}.dialog p{color:var(--muted);font-size:13px;line-height:1.6}.name-input{width:100%;background:#020617;color:white;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0 14px}.name-input:focus{outline:none;border-color:var(--cyan)}.dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}@keyframes pulse{50%{opacity:.35}}@media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
+:root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399;--red:#f87171}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tab{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:11px;padding:10px;font-weight:800;cursor:pointer}.tab.active{border-color:var(--cyan);background:#22d3ee1f;color:var(--cyan)}.tab:disabled{opacity:.4;cursor:not-allowed}
+.stage{min-height:530px;border:2px dashed var(--line);border-radius:15px;background:#02061799;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}.stage label{position:absolute;inset:0;cursor:pointer}.stage input{display:none}.empty{text-align:center;color:var(--muted);padding:25px}.empty b{display:block;color:white;font-size:18px;margin:12px}.preview{display:none;max-width:100%;max-height:680px;object-fit:contain}.preview.show{display:block}
+.editor{display:none;touch-action:none;-webkit-user-select:none;user-select:none;cursor:crosshair}.editor.show{display:block}
+.side{display:flex;flex-direction:column;gap:14px}.title{font-size:18px;font-weight:800;margin:2px 0 16px}.subtitle{font-size:14px;font-weight:800;margin:0 0 8px}.btn{width:100%;border:0;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--cyan);color:#020617}.green{background:var(--green);color:#020617}.outline{background:transparent;border:1px solid var(--line);color:white}.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.controls{margin-top:18px;padding-top:16px;border-top:1px solid #1e293b}.control{margin-bottom:17px}.row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}.range{width:100%;accent-color:var(--cyan)}.legend{font-size:11px;color:#64748b;display:flex;justify-content:space-between}.hint{font-size:12px;line-height:1.65;margin:0 0 10px}.warn{color:var(--red);font-size:12px;margin:6px 0 0;display:none}.warn.show{display:block}.check{display:flex;align-items:center;gap:9px;font-size:14px;margin:4px 0 18px}.check input{width:18px;height:18px;accent-color:var(--cyan)}
+.status{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);width:min(850px,calc(100% - 28px));background:#0f172af2;border:1px solid var(--line);border-radius:14px;padding:12px 14px;z-index:10}.statusline{display:flex;gap:9px;align-items:center;font-size:13px}.dot{width:10px;height:10px;border-radius:50%;background:var(--green);flex:none}.dot.busy{background:var(--cyan);animation:pulse 1s infinite}.bar{height:6px;background:#1e293b;border-radius:8px;overflow:hidden;margin-top:8px;display:none}.bar.show{display:block}.fill{height:100%;background:var(--cyan);width:0}.foot{text-align:center;color:#64748b;font-size:11px;line-height:1.6}.modal{position:fixed;inset:0;background:#020617cc;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.dialog{width:min(460px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 24px 70px #000a}.dialog h2{margin:0 0 8px}.dialog p{color:var(--muted);font-size:13px;line-height:1.6}.name-input{width:100%;background:#020617;color:white;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0 14px}.name-input:focus{outline:none;border-color:var(--cyan)}.dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}@keyframes pulse{50%{opacity:.35}}
+@media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn,.tab{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
 </style></head>
 <body><main class="app">
-<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V10</div><h1>レシート・領収書スキャナー</h1><p class="sub">台形補正、余白カット、リアルタイム傾き調整、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
-<div class="grid"><section class="card"><div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>画像を選択</b><span>画像を選択してください</span></div><img id="preview" class="preview" alt="補正プレビュー"></div><canvas id="sourceCanvas" hidden></canvas><canvas id="baseCanvas" hidden></canvas><canvas id="workCanvas" hidden></canvas><canvas id="outputCanvas" hidden></canvas></section>
-<aside class="side"><section class="card"><h2 class="title">▣ 画像補正</h2><button id="auto" class="btn primary" disabled>✨ 自動スキャン</button>
-<div class="controls"><p class="hint">各スライダーの変更は、約0.15秒後にプレビューへ自動反映されます。</p>
+<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V11</div><h1>レシート・領収書スキャナー</h1><p class="sub">四隅の自動検出・手動調整、台形補正、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
+<div class="grid"><section class="card">
+<div class="tabs"><button id="tabEdit" class="tab active" disabled>① 四隅を調整</button><button id="tabResult" class="tab" disabled>② 補正結果</button></div>
+<div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label id="pick" for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>画像を選択</b><span>画像を選択してください</span></div><canvas id="editCanvas" class="editor"></canvas><img id="preview" class="preview" alt="補正プレビュー"></div>
+<canvas id="sourceCanvas" hidden></canvas><canvas id="baseCanvas" hidden></canvas><canvas id="outputCanvas" hidden></canvas></section>
+<aside class="side"><section class="card"><h2 class="title">▣ 画像補正</h2>
+<button id="auto" class="btn primary" disabled>✨ 自動スキャン（四隅を自動検出）</button>
+<div class="controls"><h3 class="subtitle">四隅の手動調整</h3><p class="hint">画像上の●をドラッグして、レシートの角に合わせてください。ドラッグ中は拡大鏡が表示されます。指を離すと補正結果に自動反映されます。</p>
+<div class="btn-row"><button id="applyCorners" class="btn green" disabled>✔ この四隅で決定</button><button id="fullCorners" class="btn outline" disabled>画像全体に戻す</button></div><p id="quadWarn" class="warn">四隅の線が交差しています。角の位置を見直してください。</p></div>
+<div class="controls"><h3 class="subtitle">仕上げ</h3>
 <div class="control"><div class="row"><span>回転</span><span id="rotationValue">0°</span></div><input id="rotation" class="range" type="range" min="-15" max="15" step="0.5" value="0"><div class="legend"><span>左回転</span><span>右回転</span></div></div>
-<div class="control"><div class="row"><span>水平方向の傾き</span><span id="horizontalValue">0</span></div><input id="horizontal" class="range" type="range" min="-25" max="25" step="1" value="0"><div class="legend"><span>下辺を広げる</span><span>上辺を広げる</span></div></div>
-<div class="control"><div class="row"><span>垂直方向の傾き</span><span id="verticalValue">0</span></div><input id="vertical" class="range" type="range" min="-25" max="25" step="1" value="0"><div class="legend"><span>右辺を広げる</span><span>左辺を広げる</span></div></div>
 <div class="control"><div class="row"><span>コントラスト</span><span id="contrastValue">100%</span></div><input id="contrast" class="range" type="range" min="70" max="170" step="1" value="100"></div>
 <label class="check"><input id="grayscale" type="checkbox">白黒化</label>
-<button id="resetAdjust" class="btn outline" disabled>調整値をリセット</button></div></section>
+<button id="resetAdjust" class="btn outline" disabled>仕上げ値をリセット</button></div></section>
 <button id="pdf" class="btn green" disabled>⇩ PDF保存</button><button id="resetAll" class="btn outline">↻ 画像と結果をリセット</button><p class="foot">初回アクセス時にアプリ本体を端末へ保存します。以後はオフラインで利用できます。画像はサーバーへ送信しません。</p></aside></div></main>
 <div id="nameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="nameTitle"><div class="dialog"><h2 id="nameTitle">PDFファイル名</h2><p>拡張子「.pdf」は自動で付きます。使用できない記号は自動的に置き換えます。</p><input id="pdfName" class="name-input" type="text" maxlength="120" autocomplete="off"><div class="dialog-actions"><button id="cancelPdf" class="btn outline">キャンセル</button><button id="savePdf" class="btn green">PDF保存</button></div></div></div>
 <div class="status"><div class="statusline"><span id="dot" class="dot"></span><span id="message">画像を選択してください</span></div><div id="bar" class="bar"><div id="fill" class="fill"></div></div></div>
 <script>
 'use strict';
-const $=id=>document.getElementById(id),E={file:$('file'),drop:$('drop'),empty:$('empty'),preview:$('preview'),source:$('sourceCanvas'),base:$('baseCanvas'),work:$('workCanvas'),output:$('outputCanvas'),auto:$('auto'),pdf:$('pdf'),resetAdjust:$('resetAdjust'),resetAll:$('resetAll'),rotation:$('rotation'),horizontal:$('horizontal'),vertical:$('vertical'),contrast:$('contrast'),grayscale:$('grayscale'),dot:$('dot'),message:$('message'),bar:$('bar'),fill:$('fill'),nameModal:$('nameModal'),pdfName:$('pdfName'),cancelPdf:$('cancelPdf'),savePdf:$('savePdf')};
-let sourceUrl='',currentUrl='',busy=false,cvReadyPromise=null,renderTimer=null,renderToken=0;
+const $=id=>document.getElementById(id),E={file:$('file'),pick:$('pick'),drop:$('drop'),empty:$('empty'),preview:$('preview'),edit:$('editCanvas'),source:$('sourceCanvas'),base:$('baseCanvas'),output:$('outputCanvas'),tabEdit:$('tabEdit'),tabResult:$('tabResult'),auto:$('auto'),applyCorners:$('applyCorners'),fullCorners:$('fullCorners'),quadWarn:$('quadWarn'),pdf:$('pdf'),resetAdjust:$('resetAdjust'),resetAll:$('resetAll'),rotation:$('rotation'),contrast:$('contrast'),grayscale:$('grayscale'),dot:$('dot'),message:$('message'),bar:$('bar'),fill:$('fill'),nameModal:$('nameModal'),pdfName:$('pdfName'),cancelPdf:$('cancelPdf'),savePdf:$('savePdf')};
+let sourceUrl='',currentUrl='',busy=false,cvReadyPromise=null,renderTimer=null,renderToken=0,applyToken=0;
+let corners=null,view='edit',drag=null,ed={s:1,pad:22,w:0,h:0,dpr:1},drawQueued=false;
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const nextFrame=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
 const loadScript=(src,name)=>new Promise((resolve,reject)=>{if(window[name])return resolve(window[name]);let s=document.querySelector(`script[src="${src}"]`);if(!s){s=document.createElement('script');s.src=src;s.async=true;document.head.appendChild(s)}s.addEventListener('load',()=>resolve(window[name]),{once:true});s.addEventListener('error',()=>reject(new Error(src+' を読み込めません')),{once:true})});
 async function getCv(){if(cvReadyPromise)return cvReadyPromise;cvReadyPromise=(async()=>{await loadScript('./libs/opencv.js','cv');let c=window.cv;if(c&&typeof c.then==='function')c=await c;for(let i=0;i<600;i++){c=window.cv;if(c&&typeof c.then==='function')c=await c;if(c?.Mat&&c?.warpPerspective)return c;await new Promise(r=>setTimeout(r,100))}throw new Error('OpenCVの初期化が完了しません')})().catch(e=>{cvReadyPromise=null;throw e});return cvReadyPromise}
 function status(msg,isBusy=false,p=0){busy=isBusy;E.message.textContent=msg;E.dot.classList.toggle('busy',isBusy);E.bar.classList.toggle('show',isBusy);E.fill.style.width=p+'%';buttons()}
-function buttons(){const ready=!!sourceUrl;E.auto.disabled=!ready||busy;E.pdf.disabled=!currentUrl||busy;E.resetAdjust.disabled=!ready||busy}
-function show(url){E.preview.src=url;E.preview.classList.add('show');E.empty.hidden=true;currentUrl=url;buttons()}
-function resetValues(){E.rotation.value=0;E.horizontal.value=0;E.vertical.value=0;E.contrast.value=100;E.grayscale.checked=false;updateLabels()}
-function updateLabels(){$('rotationValue').textContent=E.rotation.value+'°';$('horizontalValue').textContent=E.horizontal.value;$('verticalValue').textContent=E.vertical.value;$('contrastValue').textContent=E.contrast.value+'%'}
+function buttons(){const ready=!!sourceUrl,valid=ready&&!!corners&&quadValid(corners);E.auto.disabled=!ready||busy;E.pdf.disabled=!currentUrl||busy;E.resetAdjust.disabled=!ready||busy;E.applyCorners.disabled=!valid||busy;E.fullCorners.disabled=!ready||busy;E.tabEdit.disabled=!ready;E.tabResult.disabled=!currentUrl;E.quadWarn.classList.toggle('show',ready&&!!corners&&!valid)}
+function setResult(url){currentUrl=url;E.preview.src=url;buttons()}
+function setView(v){view=v;const ready=!!sourceUrl;E.tabEdit.classList.toggle('active',v==='edit');E.tabResult.classList.toggle('active',v==='result');E.edit.classList.toggle('show',ready&&v==='edit');E.preview.classList.toggle('show',ready&&v==='result'&&!!currentUrl);if(ready&&v==='edit'){layoutEditor()}}
+function resetValues(){E.rotation.value=0;E.contrast.value=100;E.grayscale.checked=false;updateLabels()}
+function updateLabels(){$('rotationValue').textContent=E.rotation.value+'°';$('contrastValue').textContent=E.contrast.value+'%'}
 function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
-async function handle(file){if(!file?.type?.startsWith('image/'))return;if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl=URL.createObjectURL(file);currentUrl='';resetValues();const img=await loadImage(sourceUrl),limit=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)?1400:1800,scale=Math.min(1,limit/Math.max(img.naturalWidth,img.naturalHeight));E.source.width=Math.round(img.naturalWidth*scale);E.source.height=Math.round(img.naturalHeight*scale);E.source.getContext('2d').drawImage(img,0,0,E.source.width,E.source.height);E.base.width=E.source.width;E.base.height=E.source.height;E.base.getContext('2d').drawImage(E.source,0,0);show(sourceUrl);status('画像を読み込みました。自動スキャンまたは手動調整ができます')}
-E.file.addEventListener('change',e=>handle(e.target.files[0]));['dragenter','dragover'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor='#22d3ee'}));['dragleave','drop'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor=''}));E.drop.addEventListener('drop',e=>handle(e.dataTransfer.files[0]));
-const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);function order(p){const y=[...p].sort((a,b)=>a.y-b.y),t=y.slice(0,2).sort((a,b)=>a.x-b.x),d=y.slice(2).sort((a,b)=>a.x-b.x);return[t[0],t[1],d[1],d[0]]}
-function contourPoints(mat){const pts=[];for(let i=0;i<mat.rows;i++){const p=mat.intPtr(i,0);pts.push({x:p[0],y:p[1]})}return pts}
-function plausibleQuad(points,w,h){if(points.length!==4)return false;const q=order(points),width=Math.max(dist(q[0],q[1]),dist(q[3],q[2])),height=Math.max(dist(q[0],q[3]),dist(q[1],q[2]));return width>w*.18&&height>h*.18&&width*height>w*h*.08}
-E.auto.addEventListener('click',async()=>{
-  const mats=[];status('ローカルOpenCVを準備中',true,8);
-  try{
-    const cv=await getCv();status('レシートの輪郭を解析中',true,20);
-    const src=cv.imread(E.source),gray=new cv.Mat(),blur=new cv.Mat(),edges=new cv.Mat();
-    const kernel=cv.Mat.ones(9,9,cv.CV_8U),contours=new cv.MatVector(),hier=new cv.Mat();
-    mats.push(src,gray,blur,edges,kernel,contours,hier);
-    cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY);cv.GaussianBlur(gray,blur,new cv.Size(7,7),0);cv.Canny(blur,edges,30,120);
-    // 指などで途切れた辺をつなぐ
-    cv.morphologyEx(edges,edges,cv.MORPH_CLOSE,kernel,new cv.Point(-1,-1),3);cv.dilate(edges,edges,kernel,new cv.Point(-1,-1),1);
-    cv.findContours(edges,contours,hier,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
-    const candidates=[];const min=src.rows*src.cols*.07;
-    for(let i=0;i<contours.size();i++){
-      const c=contours.get(i),area=Math.abs(cv.contourArea(c));
-      if(area>min){
-        const hull=new cv.Mat();cv.convexHull(c,hull);mats.push(hull);
-        const peri=cv.arcLength(hull,true);
-        for(const eps of [.018,.025,.035,.05,.07]){
-          const approx=new cv.Mat();cv.approxPolyDP(hull,approx,eps*peri,true);
-          if(approx.rows===4){const pts=contourPoints(approx);if(plausibleQuad(pts,src.cols,src.rows))candidates.push({pts,score:area*(1.10-eps)})}
-          approx.delete();
-        }
-        // 角が指で完全に隠れた場合の予備候補。凸包の最小外接矩形から四隅を推定
-        try{const rect=cv.minAreaRect(hull),rp=cv.RotatedRect.points(rect).map(p=>({x:p.x,y:p.y}));if(plausibleQuad(rp,src.cols,src.rows))candidates.push({pts:rp,score:area*.82})}catch(err){console.info('minAreaRect fallback unavailable',err)}
-      }
-      c.delete();
-    }
-    candidates.sort((a,b)=>b.score-a.score);let result=src,found=false,estimated=false;
-    if(candidates.length){
-      const raw=candidates[0].pts;estimated=candidates[0].score<(src.rows*src.cols*.07*.9);const[tl,tr,br,bl]=order(raw);
-      const w=Math.max(1,Math.round(Math.max(dist(tl,tr),dist(bl,br)))),h=Math.max(1,Math.round(Math.max(dist(tl,bl),dist(tr,br))));
-      const sp=cv.matFromArray(4,1,cv.CV_32FC2,[tl.x,tl.y,tr.x,tr.y,br.x,br.y,bl.x,bl.y]),dp=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]),m=cv.getPerspectiveTransform(sp,dp),warped=new cv.Mat();
-      mats.push(sp,dp,m,warped);cv.warpPerspective(src,warped,m,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));result=warped;found=true;
-    }
-    cv.imshow(E.base,result);resetValues();await renderAdjustments(true);
-    status(found?(estimated?'四隅を推定して自動スキャンしました。結果を確認してください':'自動スキャンが完了しました'):'四隅を検出できなかったため、画像全体を調整対象にしました');
-  }catch(e){console.error(e);status('自動スキャンに失敗しました: '+e.message)}finally{mats.forEach(m=>{try{m?.delete?.()}catch{}});busy=false;buttons()}
-});
-async function renderAdjustments(silent=false){
-  if(!sourceUrl)return;
-  const token=++renderToken,mats=[];
-  try{
-    const cv=await getCv();
-    if(token!==renderToken)return;
-    const base=cv.imread(E.base);mats.push(base);
-    const w=base.cols,h=base.rows;
+function fullCorners(){const w=E.source.width,h=E.source.height;return[{x:0,y:0},{x:w-1,y:0},{x:w-1,y:h-1},{x:0,y:h-1}]}
 
-    // 回転後も自動スキャン直後の幅・高さを維持する
-    const deg=Number(E.rotation.value);
-    const center=new cv.Point(w/2,h/2);
-    const rot=cv.getRotationMatrix2D(center,deg,1);
-    const rotated=new cv.Mat();mats.push(rot,rotated);
-    cv.warpAffine(base,rotated,rot,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
-
-    // 「狭める」のではなく、選択した辺をキャンバス全幅・全高へ広げる。
-    // 出力先は常に w x h のため、画像サイズは変化しない。
-    const horizontal=Number(E.horizontal.value)/25;
-    const vertical=Number(E.vertical.value)/25;
-    const maxInsetX=w*0.22;
-    const maxInsetY=h*0.22;
-    let stl={x:0,y:0},str={x:w-1,y:0},sbr={x:w-1,y:h-1},sbl={x:0,y:h-1};
-
-    if(horizontal>0){
-      // 上辺を広げる
-      stl.x=maxInsetX*horizontal;
-      str.x=w-1-maxInsetX*horizontal;
-    }else if(horizontal<0){
-      // 下辺を広げる
-      sbl.x=maxInsetX*(-horizontal);
-      sbr.x=w-1-maxInsetX*(-horizontal);
-    }
-
-    if(vertical>0){
-      // 左辺を広げる
-      stl.y=maxInsetY*vertical;
-      sbl.y=h-1-maxInsetY*vertical;
-    }else if(vertical<0){
-      // 右辺を広げる
-      str.y=maxInsetY*(-vertical);
-      sbr.y=h-1-maxInsetY*(-vertical);
-    }
-
-    const srcPts=cv.matFromArray(4,1,cv.CV_32FC2,[stl.x,stl.y,str.x,str.y,sbr.x,sbr.y,sbl.x,sbl.y]);
-    const dstPts=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]);
-    const matrix=cv.getPerspectiveTransform(srcPts,dstPts);
-    const perspective=new cv.Mat();
-    const finalMat=new cv.Mat();
-    mats.push(srcPts,dstPts,matrix,perspective,finalMat);
-    cv.warpPerspective(rotated,perspective,matrix,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
-    cv.convertScaleAbs(perspective,finalMat,Number(E.contrast.value)/100,0);
-
-    if(E.grayscale.checked){
-      const gray=new cv.Mat();mats.push(gray);
-      cv.cvtColor(finalMat,gray,cv.COLOR_RGBA2GRAY);
-      gray.copyTo(finalMat);
-    }
-    if(token!==renderToken)return;
-    cv.imshow(E.output,finalMat);
-    show(E.output.toDataURL('image/jpeg',.95));
-    if(!silent)status('調整結果をリアルタイム反映しました（画像サイズ維持）');
-  }catch(e){
-    console.error(e);
-    if(!silent)status('調整表示に失敗しました: '+e.message);
-  }finally{
-    mats.forEach(m=>{try{m?.delete?.()}catch{}});
-  }
+async function handle(file){if(!file?.type?.startsWith('image/'))return;if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl=URL.createObjectURL(file);currentUrl='';resetValues();const img=await loadImage(sourceUrl),limit=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)?1400:1800,scale=Math.min(1,limit/Math.max(img.naturalWidth,img.naturalHeight));E.source.width=Math.round(img.naturalWidth*scale);E.source.height=Math.round(img.naturalHeight*scale);E.source.getContext('2d').drawImage(img,0,0,E.source.width,E.source.height);E.base.width=E.source.width;E.base.height=E.source.height;E.base.getContext('2d').drawImage(E.source,0,0);
+  corners=fullCorners();E.empty.hidden=true;E.pick.hidden=true;setResult(sourceUrl);setView('edit');
+  status('画像を読み込みました。「自動スキャン」または●のドラッグで四隅を合わせてください');
+  getCv().catch(()=>{}); // OpenCVを先読み
 }
-function schedule(){updateLabels();clearTimeout(renderTimer);renderTimer=setTimeout(()=>renderAdjustments(),150)};[E.rotation,E.horizontal,E.vertical,E.contrast].forEach(x=>x.addEventListener('input',schedule));E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
+E.file.addEventListener('change',e=>handle(e.target.files[0]));['dragenter','dragover'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor='#22d3ee'}));['dragleave','drop'].forEach(n=>E.drop.addEventListener(n,e=>{e.preventDefault();E.drop.style.borderColor=''}));E.drop.addEventListener('drop',e=>handle(e.dataTransfer.files[0]));
+
+/* ===================== 幾何ユーティリティ ===================== */
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+function orderQuad(p){const cx=p.reduce((s,q)=>s+q.x,0)/p.length,cy=p.reduce((s,q)=>s+q.y,0)/p.length;const s=[...p].sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));let k=0;for(let i=1;i<4;i++)if(s[i].x+s[i].y<s[k].x+s[k].y)k=i;return[0,1,2,3].map(i=>s[(i+k)%4])} // [左上,右上,右下,左下]
+function polyArea(q){let a=0;for(let i=0;i<q.length;i++){const p=q[i],n=q[(i+1)%q.length];a+=p.x*n.y-n.x*p.y}return Math.abs(a)/2}
+function isConvex(q){let sign=0;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4],c=q[(i+2)%4];const cr=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);if(Math.abs(cr)<1e-6)return false;const s=Math.sign(cr);if(!sign)sign=s;else if(s!==sign)return false}return true}
+function quadValid(q){return q&&q.length===4&&isConvex(q)&&polyArea(q)>E.source.width*E.source.height*.01}
+function intersect(a1,a2,b1,b2){const d=(a1.x-a2.x)*(b1.y-b2.y)-(a1.y-a2.y)*(b1.x-b2.x);if(Math.abs(d)<1e-6)return null;const t=a1.x*a2.y-a1.y*a2.x,u=b1.x*b2.y-b1.y*b2.x;return{x:(t*(b1.x-b2.x)-(a1.x-a2.x)*u)/d,y:(t*(b1.y-b2.y)-(a1.y-a2.y)*u)/d}}
+function contourPoints(mat){const pts=[];for(let i=0;i<mat.rows;i++){const p=mat.intPtr(i,0);pts.push({x:p[0],y:p[1]})}return pts}
+function medianOf(data){const h=new Uint32Array(256);let n=0;for(let i=0;i<data.length;i+=3){h[data[i]]++;n++}let c=0;for(let v=0;v<256;v++){c+=h[v];if(c>=n/2)return v}return 128}
+
+/* 角が指で隠れて「角が欠けた多角形」になった場合：長い4辺を延長して交点＝本来の角を復元 */
+function linesQuad(poly,W,H){const n=poly.length,edges=[];for(let i=0;i<n;i++){const a=poly[i],b=poly[(i+1)%n];edges.push({i,a,b,len:dist(a,b)})}
+  const sel=[...edges].sort((x,y)=>y.len-x.len).slice(0,4).sort((x,y)=>x.i-y.i),out=[];
+  for(let j=0;j<4;j++){const e1=sel[j],e2=sel[(j+1)%4],p=intersect(e1.a,e1.b,e2.a,e2.b);if(!p||p.x<-W*.1||p.x>W*1.1||p.y<-H*.1||p.y>H*1.1)return null;out.push({x:clamp(p.x,0,W-1),y:clamp(p.y,0,H-1)})}
+  const q=orderQuad(out);return isConvex(q)?q:null}
+
+function quadCandidates(cv,c,W,H){const out=[],hull=new cv.Mat();
+  try{cv.convexHull(c,hull,false,true);const peri=cv.arcLength(hull,true);let linesDone=false;
+    for(const eps of[.01,.02,.03,.045,.065]){const ap=new cv.Mat();cv.approxPolyDP(hull,ap,eps*peri,true);const pts=contourPoints(ap);ap.delete();
+      if(pts.length===4)out.push({pts:orderQuad(pts),kind:'approx'});
+      else if(!linesDone&&eps>=.02&&pts.length>=5&&pts.length<=8){const q=linesQuad(pts,W,H);if(q){out.push({pts:q,kind:'lines'});linesDone=true}}}
+    try{const r=cv.minAreaRect(hull);out.push({pts:orderQuad(cv.RotatedRect.points(r).map(p=>({x:clamp(p.x,0,W-1),y:clamp(p.y,0,H-1)}))),kind:'rect'})}catch(e){}
+  }finally{hull.delete()}
+  return out}
+
+function geomScore(c,imgA){const q=c.pts;if(!isConvex(q))return-1;const A=polyArea(q),ratio=A/imgA;if(ratio<.05||ratio>.985)return-1;
+  let cosSum=0,cosMax=0;for(let i=0;i<4;i++){const p=q[(i+3)%4],o=q[i],n=q[(i+1)%4],v1={x:p.x-o.x,y:p.y-o.y},v2={x:n.x-o.x,y:n.y-o.y},cs=Math.abs((v1.x*v2.x+v1.y*v2.y)/(Math.hypot(v1.x,v1.y)*Math.hypot(v2.x,v2.y)||1));cosSum+=cs;cosMax=Math.max(cosMax,cs)}
+  if(cosMax>.55)return-1;const fill=clamp(c.area/A,0,1),kindW={approx:1,lines:.96,rect:.85}[c.kind];
+  return Math.sqrt(ratio)*(.35+.65*fill)*(1-cosSum/4)*kindW*c.wt}
+
+/* 四角形の内側が外周より明るいか（＝紙らしいか）を評価 */
+function contrastFactor(cv,q,enh,k21){const T=[];try{const W=enh.cols,H=enh.rows;const inner=cv.Mat.zeros(H,W,cv.CV_8U);T.push(inner);const pm=cv.matFromArray(4,1,cv.CV_32SC2,q.flatMap(p=>[Math.round(p.x),Math.round(p.y)]));T.push(pm);const mv=new cv.MatVector();T.push(mv);mv.push_back(pm);cv.fillPoly(inner,mv,new cv.Scalar(255));
+  const dil=new cv.Mat(),ring=new cv.Mat(),nm=new cv.Mat();T.push(dil,ring,nm);cv.dilate(inner,dil,k21,new cv.Point(-1,-1),1);cv.subtract(dil,inner,ring,nm,-1);
+  const mi=cv.mean(enh,inner)[0],mo=cv.countNonZero(ring)>0?cv.mean(enh,ring)[0]:mi;return .6+clamp((mi-mo)/80,0,1)*.8}finally{T.forEach(m=>{try{m.delete()}catch(e){}})}}
+
+/* ===================== 四隅の自動検出 =====================
+   検出用コピーだけコントラストを強調（CLAHE）して輪郭を探す。
+   補正は元画像に対して行うため、「コントラストを戻す」処理は不要。 */
+function detectQuad(cv){const T=[],K=m=>{T.push(m);return m};
+  try{const S=E.source,k=Math.min(1,900/Math.max(S.width,S.height));
+    const src=K(cv.imread(S)),small=K(new cv.Mat());cv.resize(src,small,new cv.Size(Math.max(1,Math.round(S.width*k)),Math.max(1,Math.round(S.height*k))),0,0,cv.INTER_AREA);
+    const W=small.cols,H=small.rows,imgA=W*H,P=new cv.Point(-1,-1);
+    const rgb=K(new cv.Mat()),gray=K(new cv.Mat()),enh=K(new cv.Mat()),blur=K(new cv.Mat());
+    cv.cvtColor(small,rgb,cv.COLOR_RGBA2RGB);cv.cvtColor(rgb,gray,cv.COLOR_RGB2GRAY);
+    // ① コントラスト強調（局所的なヒストグラム平坦化）
+    try{const cl=new cv.CLAHE(3,new cv.Size(8,8));cl.apply(gray,enh);cl.delete()}catch(e){cv.equalizeHist(gray,enh)}
+    cv.GaussianBlur(enh,blur,new cv.Size(5,5),0);
+    // ② 「白さ」マップ＝明るさ－彩度。紙は高く、指（肌色）や色付き背景は低くなる
+    const hsv=K(new cv.Mat()),ch=K(new cv.MatVector());cv.cvtColor(rgb,hsv,cv.COLOR_RGB2HSV);cv.split(hsv,ch);
+    const sat=K(ch.get(1)),val=K(ch.get(2)),white=K(new cv.Mat()),nm=K(new cv.Mat());cv.subtract(val,sat,white,nm,-1);cv.GaussianBlur(white,white,new cv.Size(7,7),0);
+    const k5=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(5,5))),k15=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(15,15))),k21=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(21,21)));
+    const sources=[];
+    // 方式A：エッジ（しきい値を3段階で試す）
+    const med=medianOf(blur.data);
+    for(const[lo,hi]of[[Math.max(10,med*.66),Math.min(255,Math.max(40,med*1.33))],[25,90],[60,180]]){const e=K(new cv.Mat());cv.Canny(blur,e,lo,hi);cv.morphologyEx(e,e,cv.MORPH_CLOSE,k5,P,2);cv.dilate(e,e,k5,P,1);sources.push({m:e,wt:.95})}
+    // 方式B：白さマップを自動二値化（指・複雑な背景に強い）
+    const mW=K(new cv.Mat());cv.threshold(white,mW,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);cv.morphologyEx(mW,mW,cv.MORPH_OPEN,k5,P,1);cv.morphologyEx(mW,mW,cv.MORPH_CLOSE,k15,P,2);sources.push({m:mW,wt:1.05});
+    // 方式C：コントラスト強調後の明るさを自動二値化
+    const mB=K(new cv.Mat());cv.threshold(blur,mB,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);cv.morphologyEx(mB,mB,cv.MORPH_OPEN,k5,P,1);cv.morphologyEx(mB,mB,cv.MORPH_CLOSE,k15,P,2);sources.push({m:mB,wt:1});
+    // 候補収集
+    const cands=[];
+    for(const s of sources){const cs=K(new cv.MatVector()),hi=K(new cv.Mat());cv.findContours(s.m,cs,hi,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+      for(let i=0;i<cs.size();i++){const c=cs.get(i),a=Math.abs(cv.contourArea(c));if(a>imgA*.04){for(const q of quadCandidates(cv,c,W,H))cands.push({...q,area:a,wt:s.wt})}c.delete()}}
+    // 形状で一次評価 → 上位だけ明暗差で二次評価
+    const scored=cands.map(c=>({...c,g:geomScore(c,imgA)})).filter(c=>c.g>0).sort((a,b)=>b.g-a.g).slice(0,12);
+    let best=null;for(const c of scored){const sc=c.g*contrastFactor(cv,c.pts,enh,k21);if(!best||sc>best.score)best={...c,score:sc}}
+    if(!best)return null;const inv=1/k;
+    return{pts:best.pts.map(p=>({x:clamp(p.x*inv,0,S.width-1),y:clamp(p.y*inv,0,S.height-1)})),kind:best.kind};
+  }finally{T.forEach(m=>{try{m.delete()}catch(e){}})}}
+
+E.auto.addEventListener('click',async()=>{
+  status('ローカルOpenCVを準備中',true,8);
+  try{const cv=await getCv();status('コントラストを強調して四隅を探索中',true,35);await nextFrame();
+    const r=detectQuad(cv);
+    if(r){corners=r.pts;E.rotation.value=0;updateLabels();status('補正中',true,75);await applyCorners(true);setView('result');
+      status(r.kind==='approx'?'自動スキャンが完了しました。ずれている場合は「① 四隅を調整」で直せます':'隠れた角を推定してスキャンしました。「① 四隅を調整」で確認してください')}
+    else{corners=fullCorners();setView('edit');status('四隅を自動検出できませんでした。●をドラッグして角に合わせてください')}
+  }catch(e){console.error(e);status('自動スキャンに失敗しました: '+e.message)}finally{busy=false;buttons();drawEditor()}
+});
+
+/* ===================== 四隅で台形補正 ===================== */
+async function applyCorners(silent=false){
+  if(!quadValid(corners)){buttons();return false}
+  const token=++applyToken,mats=[];
+  try{const cv=await getCv();if(token!==applyToken)return false;
+    const[tl,tr,br,bl]=corners,src=cv.imread(E.source);mats.push(src);
+    const w=Math.max(1,Math.round(Math.max(dist(tl,tr),dist(bl,br)))),h=Math.max(1,Math.round(Math.max(dist(tl,bl),dist(tr,br))));
+    const sp=cv.matFromArray(4,1,cv.CV_32FC2,[tl.x,tl.y,tr.x,tr.y,br.x,br.y,bl.x,bl.y]),dp=cv.matFromArray(4,1,cv.CV_32FC2,[0,0,w-1,0,w-1,h-1,0,h-1]),m=cv.getPerspectiveTransform(sp,dp),warped=new cv.Mat();mats.push(sp,dp,m,warped);
+    cv.warpPerspective(src,warped,m,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
+    if(token!==applyToken)return false;
+    cv.imshow(E.base,warped);await renderAdjustments(true);
+    if(!silent)status('四隅の位置で補正しました');return true;
+  }catch(e){console.error(e);if(!silent)status('補正に失敗しました: '+e.message);return false}
+  finally{mats.forEach(m=>{try{m.delete()}catch(e){}})}}
+
+/* ===================== 仕上げ（回転・コントラスト・白黒） ===================== */
+async function renderAdjustments(silent=false){
+  if(!sourceUrl)return;const token=++renderToken,mats=[];
+  try{const cv=await getCv();if(token!==renderToken)return;
+    const base=cv.imread(E.base);mats.push(base);const w=base.cols,h=base.rows;
+    const rot=cv.getRotationMatrix2D(new cv.Point(w/2,h/2),Number(E.rotation.value),1),rotated=new cv.Mat(),finalMat=new cv.Mat();mats.push(rot,rotated,finalMat);
+    cv.warpAffine(base,rotated,rot,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
+    cv.convertScaleAbs(rotated,finalMat,Number(E.contrast.value)/100,0);
+    if(E.grayscale.checked){const gray=new cv.Mat();mats.push(gray);cv.cvtColor(finalMat,gray,cv.COLOR_RGBA2GRAY);gray.copyTo(finalMat)}
+    if(token!==renderToken)return;
+    cv.imshow(E.output,finalMat);setResult(E.output.toDataURL('image/jpeg',.95));setView(view);
+    if(!silent)status('仕上げを反映しました');
+  }catch(e){console.error(e);if(!silent)status('調整表示に失敗しました: '+e.message)}
+  finally{mats.forEach(m=>{try{m?.delete?.()}catch(e){}})}}
+function schedule(){updateLabels();clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(view!=='result')setView('result');renderAdjustments()},150)}
+[E.rotation,E.contrast].forEach(x=>x.addEventListener('input',schedule));E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
+
+/* ===================== 四隅エディタ（ドラッグ操作） ===================== */
+function layoutEditor(){if(!sourceUrl||view!=='edit')return;const W=E.source.width,H=E.source.height,pad=ed.pad;
+  const availW=Math.max(200,E.drop.clientWidth-4),maxH=innerWidth<=850?Math.round(innerHeight*.62):680;
+  const s=Math.min((availW-pad*2)/W,(maxH-pad*2)/H),dpr=Math.min(3,devicePixelRatio||1);
+  ed={s,pad,w:Math.round(W*s+pad*2),h:Math.round(H*s+pad*2),dpr};
+  E.edit.width=Math.round(ed.w*dpr);E.edit.height=Math.round(ed.h*dpr);E.edit.style.width=ed.w+'px';E.edit.style.height=ed.h+'px';drawEditor()}
+const toScreen=p=>({x:ed.pad+p.x*ed.s,y:ed.pad+p.y*ed.s});
+const toSource=q=>({x:clamp((q.x-ed.pad)/ed.s,0,E.source.width-1),y:clamp((q.y-ed.pad)/ed.s,0,E.source.height-1)});
+function requestDraw(){if(drawQueued)return;drawQueued=true;requestAnimationFrame(()=>{drawQueued=false;drawEditor()})}
+function drawEditor(){if(!sourceUrl||view!=='edit'||!ed.w)return;const c=E.edit.getContext('2d'),{s,pad,dpr}=ed,W=E.source.width,H=E.source.height;
+  c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,ed.w,ed.h);c.imageSmoothingQuality='high';c.drawImage(E.source,pad,pad,W*s,H*s);
+  if(!corners)return;const pts=corners.map(toScreen),ok=quadValid(corners),col=ok?'#22d3ee':'#f87171';
+  // 枠外を暗くする
+  c.beginPath();c.rect(pad,pad,W*s,H*s);c.moveTo(pts[0].x,pts[0].y);for(let i=1;i<4;i++)c.lineTo(pts[i].x,pts[i].y);c.closePath();c.fillStyle='rgba(2,6,23,.55)';c.fill('evenodd');
+  // 枠線
+  c.beginPath();c.moveTo(pts[0].x,pts[0].y);for(let i=1;i<4;i++)c.lineTo(pts[i].x,pts[i].y);c.closePath();c.lineWidth=2.5;c.strokeStyle=col;c.stroke();
+  // ハンドル
+  pts.forEach((p,i)=>{const act=drag&&drag.i===i;c.beginPath();c.arc(p.x,p.y,act?15:12,0,Math.PI*2);c.fillStyle=act?'rgba(34,211,238,.35)':'rgba(34,211,238,.22)';c.fill();c.lineWidth=3;c.strokeStyle=col;c.stroke();c.beginPath();c.arc(p.x,p.y,3,0,Math.PI*2);c.fillStyle='#fff';c.fill()});
+  if(drag)drawLoupe(c,drag.i,pts)}
+function drawLoupe(c,i,pts){const R=64,Z=3,p=pts[i],sp=corners[i],W=E.source.width,H=E.source.height;
+  const cx=p.x<ed.w/2?ed.w-R-10:R+10,cy=R+10,f=ed.s*Z,half=R/f;
+  c.save();c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.closePath();c.fillStyle='#020617';c.fill();c.clip();
+  // 画像外にはみ出す部分を除いて描画（Safari対策）
+  const sx0=Math.max(0,sp.x-half),sy0=Math.max(0,sp.y-half),sx1=Math.min(W,sp.x+half),sy1=Math.min(H,sp.y+half);
+  if(sx1>sx0&&sy1>sy0)c.drawImage(E.source,sx0,sy0,sx1-sx0,sy1-sy0,cx+(sx0-sp.x)*f,cy+(sy0-sp.y)*f,(sx1-sx0)*f,(sy1-sy0)*f);
+  // 隣の2辺
+  const L=q=>({x:cx+(q.x-sp.x)*f,y:cy+(q.y-sp.y)*f}),a=L(corners[(i+3)%4]),b=L(corners[(i+1)%4]);c.beginPath();c.moveTo(a.x,a.y);c.lineTo(cx,cy);c.lineTo(b.x,b.y);c.lineWidth=2;c.strokeStyle=quadValid(corners)?'#22d3ee':'#f87171';c.stroke();
+  // 十字線
+  c.beginPath();c.moveTo(cx-14,cy);c.lineTo(cx+14,cy);c.moveTo(cx,cy-14);c.lineTo(cx,cy+14);c.lineWidth=1.5;c.strokeStyle='#fff';c.stroke();
+  c.restore();c.beginPath();c.arc(cx,cy,R,0,Math.PI*2);c.lineWidth=3;c.strokeStyle='#fff';c.stroke()}
+function evPoint(e){const r=E.edit.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+E.edit.addEventListener('pointerdown',e=>{if(!corners||busy)return;const p=evPoint(e);let best=-1,bd=48;corners.map(toScreen).forEach((q,i)=>{const d=dist(p,q);if(d<bd){bd=d;best=i}});
+  if(best<0)return;e.preventDefault();const q=toScreen(corners[best]);drag={i:best,ox:q.x-p.x,oy:q.y-p.y,id:e.pointerId};try{E.edit.setPointerCapture(e.pointerId)}catch(err){}requestDraw()});
+E.edit.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;e.preventDefault();const p=evPoint(e);corners[drag.i]=toSource({x:p.x+drag.ox,y:p.y+drag.oy});requestDraw()});
+function endDrag(e){if(!drag||(e&&e.pointerId!==drag.id))return;drag=null;requestDraw();buttons();
+  if(quadValid(corners)){applyCorners(true).then(ok=>{if(ok)status('四隅を更新しました。「② 補正結果」で確認できます')})}else status('四隅の線が交差しています。角の位置を見直してください')}
+E.edit.addEventListener('pointerup',endDrag);E.edit.addEventListener('pointercancel',endDrag);E.edit.addEventListener('lostpointercapture',endDrag);
+window.addEventListener('resize',()=>{clearTimeout(window.__lt);window.__lt=setTimeout(layoutEditor,120)});
+
+E.tabEdit.addEventListener('click',()=>setView('edit'));
+E.tabResult.addEventListener('click',()=>setView('result'));
+E.applyCorners.addEventListener('click',async()=>{status('補正中',true,50);const ok=await applyCorners(true);busy=false;if(ok){setView('result');status('四隅の位置で補正しました')}else status('補正できませんでした。四隅の位置を確認してください')});
+E.fullCorners.addEventListener('click',()=>{corners=fullCorners();requestDraw();buttons();applyCorners(true).then(()=>status('四隅を画像全体に戻しました'))});
+
+/* ===================== PDF保存（V10と同じ） ===================== */
 function defaultPdfName(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `領収書_${y}-${m}-${day}`}
 function safeFileName(value){let name=(value||'').trim().replace(/[\\/:*?"<>|]/g,'_').replace(/[. ]+$/g,'').slice(0,120);if(!name)name=defaultPdfName();if(!name.toLowerCase().endsWith('.pdf'))name+='.pdf';return name}
 E.pdf.addEventListener('click',()=>{E.pdfName.value=defaultPdfName();E.nameModal.classList.add('show');setTimeout(()=>{E.pdfName.focus();E.pdfName.select()},50)});
@@ -152,57 +219,19 @@ E.nameModal.addEventListener('click',e=>{if(e.target===E.nameModal)E.nameModal.c
 E.pdfName.addEventListener('keydown',e=>{if(e.key==='Enter')E.savePdf.click();if(e.key==='Escape')E.cancelPdf.click()});
 E.savePdf.addEventListener('click',async()=>{E.nameModal.classList.remove('show');
   status('A4・350dpiのPDFを作成中',true,20);
-  try{
-    await loadScript('./libs/pdf-lib.min.js','PDFLib');
-    const source=await loadImage(currentUrl);
-
-    // A4縦 350dpi = 2894 × 4093 px
-    const A4_PX_W=2894,A4_PX_H=4093;
-    // ISO A4をPDFポイントへ換算したサイズ
-    const A4_PT_W=595.28,A4_PT_H=841.89;
-    const MARGIN_PX=118; // 約10mm（350dpi）
-
-    const pageCanvas=document.createElement('canvas');
-    pageCanvas.width=A4_PX_W;
-    pageCanvas.height=A4_PX_H;
-    const ctx=pageCanvas.getContext('2d',{alpha:false});
-    ctx.fillStyle='#ffffff';
-    ctx.fillRect(0,0,A4_PX_W,A4_PX_H);
-
-    const usableW=A4_PX_W-MARGIN_PX*2;
-    const usableH=A4_PX_H-MARGIN_PX*2;
-    const ratio=Math.min(usableW/source.naturalWidth,usableH/source.naturalHeight);
-    const drawW=Math.max(1,Math.round(source.naturalWidth*ratio));
-    const drawH=Math.max(1,Math.round(source.naturalHeight*ratio));
-    const drawX=Math.round((A4_PX_W-drawW)/2);
-    const drawY=Math.round((A4_PX_H-drawH)/2);
-    ctx.imageSmoothingEnabled=true;
-    ctx.imageSmoothingQuality='high';
-    ctx.drawImage(source,drawX,drawY,drawW,drawH);
-
-    const jpgData=pageCanvas.toDataURL('image/jpeg',0.96);
-    const jpgBytes=await fetch(jpgData).then(r=>r.arrayBuffer());
-    const pdf=await PDFLib.PDFDocument.create();
-    const image=await pdf.embedJpg(jpgBytes);
-    const page=pdf.addPage([A4_PT_W,A4_PT_H]);
-    page.drawImage(image,{x:0,y:0,width:A4_PT_W,height:A4_PT_H});
-    pdf.setTitle('Receipt Scan A4 350dpi');
-    pdf.setSubject('A4 350dpi equivalent raster image');
-
-    const out=await pdf.save();
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([out],{type:'application/pdf'}));
-    a.download=safeFileName(E.pdfName.value);
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  try{await loadScript('./libs/pdf-lib.min.js','PDFLib');const source=await loadImage(currentUrl);
+    const A4_PX_W=2894,A4_PX_H=4093,A4_PT_W=595.28,A4_PT_H=841.89,MARGIN_PX=118;
+    const pageCanvas=document.createElement('canvas');pageCanvas.width=A4_PX_W;pageCanvas.height=A4_PX_H;const ctx=pageCanvas.getContext('2d',{alpha:false});ctx.fillStyle='#ffffff';ctx.fillRect(0,0,A4_PX_W,A4_PX_H);
+    const usableW=A4_PX_W-MARGIN_PX*2,usableH=A4_PX_H-MARGIN_PX*2,ratio=Math.min(usableW/source.naturalWidth,usableH/source.naturalHeight);
+    const drawW=Math.max(1,Math.round(source.naturalWidth*ratio)),drawH=Math.max(1,Math.round(source.naturalHeight*ratio)),drawX=Math.round((A4_PX_W-drawW)/2),drawY=Math.round((A4_PX_H-drawH)/2);
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(source,drawX,drawY,drawW,drawH);
+    const jpgBytes=await fetch(pageCanvas.toDataURL('image/jpeg',0.96)).then(r=>r.arrayBuffer());
+    const pdf=await PDFLib.PDFDocument.create(),image=await pdf.embedJpg(jpgBytes),page=pdf.addPage([A4_PT_W,A4_PT_H]);page.drawImage(image,{x:0,y:0,width:A4_PT_W,height:A4_PT_H});pdf.setTitle('Receipt Scan A4 350dpi');pdf.setSubject('A4 350dpi equivalent raster image');
+    const out=await pdf.save(),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'application/pdf'}));a.download=safeFileName(E.pdfName.value);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     status('A4・350dpi相当（2894×4093px）のPDFを書き出しました');
-  }catch(e){
-    console.error(e);
-    status('PDF作成に失敗しました: '+e.message);
-  }finally{
-    busy=false;
-    buttons();
-  }
-});
-E.resetAll.addEventListener('click',()=>{if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl='';currentUrl='';E.preview.removeAttribute('src');E.preview.classList.remove('show');E.empty.hidden=false;E.file.value='';resetValues();status('画像を選択してください')});if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const registration=await navigator.serviceWorker.register('./service-worker.js');await navigator.serviceWorker.ready;if(navigator.onLine)status('PWAの準備が完了しました。写真アプリから画像を選択できます');else status('オフラインで起動しました')}catch(e){console.error(e);status('PWA登録に失敗しました。HTTPSで公開されているか確認してください')}})}else{status('このブラウザはオフラインPWAに対応していません')}window.addEventListener('offline',()=>status('オフラインになりました。保存済み機能は利用できます'));window.addEventListener('online',()=>status('オンラインに戻りました'));updateLabels();buttons();
+  }catch(e){console.error(e);status('PDF作成に失敗しました: '+e.message)}finally{busy=false;buttons()}});
+
+E.resetAll.addEventListener('click',()=>{if(sourceUrl)URL.revokeObjectURL(sourceUrl);sourceUrl='';currentUrl='';corners=null;drag=null;E.preview.removeAttribute('src');E.empty.hidden=false;E.pick.hidden=false;E.file.value='';resetValues();setView('edit');E.edit.classList.remove('show');status('画像を選択してください')});
+if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{await navigator.serviceWorker.register('./service-worker.js');await navigator.serviceWorker.ready;if(navigator.onLine)status('PWAの準備が完了しました。写真アプリから画像を選択できます');else status('オフラインで起動しました')}catch(e){console.error(e);status('PWA登録に失敗しました。HTTPSで公開されているか確認してください')}})}else{status('このブラウザはオフラインPWAに対応していません')}
+window.addEventListener('offline',()=>status('オフラインになりました。保存済み機能は利用できます'));window.addEventListener('online',()=>status('オンラインに戻りました'));updateLabels();buttons();
 </script></body></html>
