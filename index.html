@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V11.1</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V11.2</title>
 <style>
 :root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399;--red:#f87171}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tab{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:11px;padding:10px;font-weight:800;cursor:pointer}.tab.active{border-color:var(--cyan);background:#22d3ee1f;color:var(--cyan)}.tab:disabled{opacity:.4;cursor:not-allowed}
@@ -12,7 +12,7 @@
 @media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn,.tab{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
 </style></head>
 <body><main class="app">
-<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V11.1</div><h1>レシート・領収書スキャナー</h1><p class="sub">四隅の自動検出・手動調整、台形補正、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
+<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V11.2</div><h1>レシート・領収書スキャナー</h1><p class="sub">四隅の自動検出・手動調整、台形補正、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
 <div class="grid"><section class="card">
 <div class="tabs"><button id="tabEdit" class="tab active" disabled>① 四隅を調整</button><button id="tabResult" class="tab" disabled>② 補正結果</button></div>
 <div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label id="pick" for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>画像を選択</b><span>画像を選択してください</span></div><canvas id="editCanvas" class="editor"></canvas><img id="preview" class="preview" alt="補正プレビュー"></div>
@@ -22,7 +22,6 @@
 <div class="controls"><h3 class="subtitle">四隅の手動調整</h3><p class="hint">画像上の●をドラッグして、レシートの角に合わせてください。ドラッグ中は拡大鏡が表示されます。指を離すと補正結果に自動反映されます。</p>
 <div class="btn-row"><button id="applyCorners" class="btn green" disabled>✔ この四隅で決定</button><button id="fullCorners" class="btn outline" disabled>画像全体に戻す</button></div><p id="quadWarn" class="warn">四隅の線が交差しています。角の位置を見直してください。</p></div>
 <div class="controls"><h3 class="subtitle">仕上げ</h3>
-<div class="control"><div class="row"><span>回転</span><span id="rotationValue">0°</span></div><input id="rotation" class="range" type="range" min="-15" max="15" step="0.5" value="0"><div class="legend"><span>左回転</span><span>右回転</span></div></div>
 <div class="control"><div class="row"><span>コントラスト</span><span id="contrastValue">100%</span></div><input id="contrast" class="range" type="range" min="70" max="170" step="1" value="100"></div>
 <label class="check"><input id="grayscale" type="checkbox">白黒化</label>
 <button id="resetAdjust" class="btn outline" disabled>仕上げ値をリセット</button></div></section>
@@ -31,7 +30,7 @@
 <div class="status"><div class="statusline"><span id="dot" class="dot"></span><span id="message">画像を選択してください</span></div><div id="bar" class="bar"><div id="fill" class="fill"></div></div></div>
 <script>
 'use strict';
-const $=id=>document.getElementById(id),E={file:$('file'),pick:$('pick'),drop:$('drop'),empty:$('empty'),preview:$('preview'),edit:$('editCanvas'),source:$('sourceCanvas'),base:$('baseCanvas'),output:$('outputCanvas'),tabEdit:$('tabEdit'),tabResult:$('tabResult'),auto:$('auto'),applyCorners:$('applyCorners'),fullCorners:$('fullCorners'),quadWarn:$('quadWarn'),pdf:$('pdf'),resetAdjust:$('resetAdjust'),resetAll:$('resetAll'),rotation:$('rotation'),contrast:$('contrast'),grayscale:$('grayscale'),dot:$('dot'),message:$('message'),bar:$('bar'),fill:$('fill'),nameModal:$('nameModal'),pdfName:$('pdfName'),cancelPdf:$('cancelPdf'),savePdf:$('savePdf')};
+const $=id=>document.getElementById(id),E={file:$('file'),pick:$('pick'),drop:$('drop'),empty:$('empty'),preview:$('preview'),edit:$('editCanvas'),source:$('sourceCanvas'),base:$('baseCanvas'),output:$('outputCanvas'),tabEdit:$('tabEdit'),tabResult:$('tabResult'),auto:$('auto'),applyCorners:$('applyCorners'),fullCorners:$('fullCorners'),quadWarn:$('quadWarn'),pdf:$('pdf'),resetAdjust:$('resetAdjust'),resetAll:$('resetAll'),contrast:$('contrast'),grayscale:$('grayscale'),dot:$('dot'),message:$('message'),bar:$('bar'),fill:$('fill'),nameModal:$('nameModal'),pdfName:$('pdfName'),cancelPdf:$('cancelPdf'),savePdf:$('savePdf')};
 let sourceUrl='',currentUrl='',busy=false,cvReadyPromise=null,renderTimer=null,renderToken=0,applyToken=0;
 let corners=null,view='edit',drag=null,ed={s:1,pad:22,w:0,h:0,dpr:1},drawQueued=false;
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -42,8 +41,8 @@ function status(msg,isBusy=false,p=0){busy=isBusy;E.message.textContent=msg;E.do
 function buttons(){const ready=!!sourceUrl,valid=ready&&!!corners&&quadValid(corners);E.auto.disabled=!ready||busy;E.pdf.disabled=!currentUrl||busy;E.resetAdjust.disabled=!ready||busy;E.applyCorners.disabled=!valid||busy;E.fullCorners.disabled=!ready||busy;E.tabEdit.disabled=!ready;E.tabResult.disabled=!currentUrl;E.quadWarn.classList.toggle('show',ready&&!!corners&&!valid)}
 function setResult(url){currentUrl=url;E.preview.src=url;buttons()}
 function setView(v){view=v;const ready=!!sourceUrl;E.tabEdit.classList.toggle('active',v==='edit');E.tabResult.classList.toggle('active',v==='result');E.edit.classList.toggle('show',ready&&v==='edit');E.preview.classList.toggle('show',ready&&v==='result'&&!!currentUrl);if(ready&&v==='edit'){layoutEditor()}}
-function resetValues(){E.rotation.value=0;E.contrast.value=100;E.grayscale.checked=false;updateLabels()}
-function updateLabels(){$('rotationValue').textContent=E.rotation.value+'°';$('contrastValue').textContent=E.contrast.value+'%'}
+function resetValues(){E.contrast.value=100;E.grayscale.checked=false;updateLabels()}
+function updateLabels(){$('contrastValue').textContent=E.contrast.value+'%'}
 function loadImage(url){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=reject;i.src=url})}
 function fullCorners(){const w=E.source.width,h=E.source.height;return[{x:0,y:0},{x:w-1,y:0},{x:w-1,y:h-1},{x:0,y:h-1}]}
 
@@ -119,7 +118,7 @@ E.auto.addEventListener('click',async()=>{
   status('ローカルOpenCVを準備中',true,8);
   try{const cv=await getCv();status('コントラストを強調して四隅を探索中',true,35);await nextFrame();
     const r=detectQuad(cv);
-    if(r){corners=r.pts;E.rotation.value=0;updateLabels();status('補正中',true,75);await applyCorners(true);setView('result');
+    if(r){corners=r.pts;status('補正中',true,75);await applyCorners(true);setView('result');
       status('自動スキャンが完了しました。ずれている場合は「① 四隅を調整」で直せます')}
     else{corners=fullCorners();setView('edit');status('四隅を自動検出できませんでした。●をドラッグして角に合わせてください')}
   }catch(e){console.error(e);status('自動スキャンに失敗しました: '+e.message)}finally{busy=false;buttons();drawEditor()}
@@ -140,14 +139,13 @@ async function applyCorners(silent=false){
   }catch(e){console.error(e);if(!silent)status('補正に失敗しました: '+e.message);return false}
   finally{mats.forEach(m=>{try{m.delete()}catch(e){}})}}
 
-/* ===================== 仕上げ（回転・コントラスト・白黒） ===================== */
+/* ===================== 仕上げ（コントラスト・白黒） ===================== */
 async function renderAdjustments(silent=false){
   if(!sourceUrl)return;const token=++renderToken,mats=[];
   try{const cv=await getCv();if(token!==renderToken)return;
-    const base=cv.imread(E.base);mats.push(base);const w=base.cols,h=base.rows;
-    const rot=cv.getRotationMatrix2D(new cv.Point(w/2,h/2),Number(E.rotation.value),1),rotated=new cv.Mat(),finalMat=new cv.Mat();mats.push(rot,rotated,finalMat);
-    cv.warpAffine(base,rotated,rot,new cv.Size(w,h),cv.INTER_CUBIC,cv.BORDER_CONSTANT,new cv.Scalar(255,255,255,255));
-    cv.convertScaleAbs(rotated,finalMat,Number(E.contrast.value)/100,0);
+    const base=cv.imread(E.base);mats.push(base);
+    const finalMat=new cv.Mat();mats.push(finalMat);
+    cv.convertScaleAbs(base,finalMat,Number(E.contrast.value)/100,0);
     if(E.grayscale.checked){const gray=new cv.Mat();mats.push(gray);cv.cvtColor(finalMat,gray,cv.COLOR_RGBA2GRAY);gray.copyTo(finalMat)}
     if(token!==renderToken)return;
     cv.imshow(E.output,finalMat);setResult(E.output.toDataURL('image/jpeg',.95));setView(view);
@@ -155,7 +153,7 @@ async function renderAdjustments(silent=false){
   }catch(e){console.error(e);if(!silent)status('調整表示に失敗しました: '+e.message)}
   finally{mats.forEach(m=>{try{m?.delete?.()}catch(e){}})}}
 function schedule(){updateLabels();clearTimeout(renderTimer);renderTimer=setTimeout(()=>{if(view!=='result')setView('result');renderAdjustments()},150)}
-[E.rotation,E.contrast].forEach(x=>x.addEventListener('input',schedule));E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
+E.contrast.addEventListener('input',schedule);E.grayscale.addEventListener('change',schedule);E.resetAdjust.addEventListener('click',()=>{resetValues();renderAdjustments()});
 
 /* ===================== 四隅エディタ（ドラッグ操作） ===================== */
 function layoutEditor(){if(!sourceUrl||view!=='edit')return;const W=E.source.width,H=E.source.height,pad=ed.pad;
