@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V11</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#020617"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="レシートスキャナー"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><title>レシートスキャナー PWA V11.1</title>
 <style>
 :root{--bg:#020617;--panel:#0f172a;--line:#334155;--text:#f8fafc;--muted:#94a3b8;--cyan:#22d3ee;--green:#34d399;--red:#f87171}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI",Meiryo,system-ui,sans-serif}button,input{font:inherit}.app{max-width:1180px;margin:auto;padding:28px 18px 100px}.head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:.14em}h1{margin:5px 0;font-size:clamp(26px,4vw,40px)}.sub,.hint{color:var(--muted)}.secure{color:#86efac;background:#16a34a18;border:1px solid #22c55e44;padding:10px 13px;border-radius:14px;font-size:13px}.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr);gap:20px}.card{background:var(--panel);border:1px solid #1e293b;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0005}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tab{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:11px;padding:10px;font-weight:800;cursor:pointer}.tab.active{border-color:var(--cyan);background:#22d3ee1f;color:var(--cyan)}.tab:disabled{opacity:.4;cursor:not-allowed}
@@ -12,7 +12,7 @@
 @media(max-width:850px){.head{align-items:start;flex-direction:column}.grid{grid-template-columns:1fr}.stage{min-height:360px}.app{padding:18px 12px 110px}.btn,.tab{min-height:50px}.range{height:34px}.check{min-height:44px}.preview{max-height:62vh}.status{bottom:max(12px,env(safe-area-inset-bottom))}}
 </style></head>
 <body><main class="app">
-<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V11</div><h1>レシート・領収書スキャナー</h1><p class="sub">四隅の自動検出・手動調整、台形補正、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
+<header class="head"><div><div class="eyebrow">LOCAL RECEIPT SCANNER PWA V11.1</div><h1>レシート・領収書スキャナー</h1><p class="sub">四隅の自動検出・手動調整、台形補正、PDF化</p></div><div class="secure">🔒 画像処理は端末内のみ</div></header>
 <div class="grid"><section class="card">
 <div class="tabs"><button id="tabEdit" class="tab active" disabled>① 四隅を調整</button><button id="tabResult" class="tab" disabled>② 補正結果</button></div>
 <div class="stage" id="drop"><input id="file" type="file" accept="image/*"><label id="pick" for="file"></label><div id="empty" class="empty"><div style="font-size:42px">▧</div><b>画像を選択</b><span>画像を選択してください</span></div><canvas id="editCanvas" class="editor"></canvas><img id="preview" class="preview" alt="補正プレビュー"></div>
@@ -64,64 +64,55 @@ function intersect(a1,a2,b1,b2){const d=(a1.x-a2.x)*(b1.y-b2.y)-(a1.y-a2.y)*(b1.
 function contourPoints(mat){const pts=[];for(let i=0;i<mat.rows;i++){const p=mat.intPtr(i,0);pts.push({x:p[0],y:p[1]})}return pts}
 function medianOf(data){const h=new Uint32Array(256);let n=0;for(let i=0;i<data.length;i+=3){h[data[i]]++;n++}let c=0;for(let v=0;v<256;v++){c+=h[v];if(c>=n/2)return v}return 128}
 
-/* 角が指で隠れて「角が欠けた多角形」になった場合：長い4辺を延長して交点＝本来の角を復元 */
-function linesQuad(poly,W,H){const n=poly.length,edges=[];for(let i=0;i<n;i++){const a=poly[i],b=poly[(i+1)%n];edges.push({i,a,b,len:dist(a,b)})}
-  const sel=[...edges].sort((x,y)=>y.len-x.len).slice(0,4).sort((x,y)=>x.i-y.i),out=[];
-  for(let j=0;j<4;j++){const e1=sel[j],e2=sel[(j+1)%4],p=intersect(e1.a,e1.b,e2.a,e2.b);if(!p||p.x<-W*.1||p.x>W*1.1||p.y<-H*.1||p.y>H*1.1)return null;out.push({x:clamp(p.x,0,W-1),y:clamp(p.y,0,H-1)})}
-  const q=orderQuad(out);return isConvex(q)?q:null}
-
-function quadCandidates(cv,c,W,H){const out=[],hull=new cv.Mat();
-  try{cv.convexHull(c,hull,false,true);const peri=cv.arcLength(hull,true);let linesDone=false;
-    for(const eps of[.01,.02,.03,.045,.065]){const ap=new cv.Mat();cv.approxPolyDP(hull,ap,eps*peri,true);const pts=contourPoints(ap);ap.delete();
-      if(pts.length===4)out.push({pts:orderQuad(pts),kind:'approx'});
-      else if(!linesDone&&eps>=.02&&pts.length>=5&&pts.length<=8){const q=linesQuad(pts,W,H);if(q){out.push({pts:q,kind:'lines'});linesDone=true}}}
-    try{const r=cv.minAreaRect(hull);out.push({pts:orderQuad(cv.RotatedRect.points(r).map(p=>({x:clamp(p.x,0,W-1),y:clamp(p.y,0,H-1)}))),kind:'rect'})}catch(e){}
-  }finally{hull.delete()}
-  return out}
-
-function geomScore(c,imgA){const q=c.pts;if(!isConvex(q))return-1;const A=polyArea(q),ratio=A/imgA;if(ratio<.05||ratio>.985)return-1;
-  let cosSum=0,cosMax=0;for(let i=0;i<4;i++){const p=q[(i+3)%4],o=q[i],n=q[(i+1)%4],v1={x:p.x-o.x,y:p.y-o.y},v2={x:n.x-o.x,y:n.y-o.y},cs=Math.abs((v1.x*v2.x+v1.y*v2.y)/(Math.hypot(v1.x,v1.y)*Math.hypot(v2.x,v2.y)||1));cosSum+=cs;cosMax=Math.max(cosMax,cs)}
-  if(cosMax>.55)return-1;const fill=clamp(c.area/A,0,1),kindW={approx:1,lines:.96,rect:.85}[c.kind];
-  return Math.sqrt(ratio)*(.35+.65*fill)*(1-cosSum/4)*kindW*c.wt}
-
-/* 四角形の内側が外周より明るいか（＝紙らしいか）を評価 */
-function contrastFactor(cv,q,enh,k21){const T=[];try{const W=enh.cols,H=enh.rows;const inner=cv.Mat.zeros(H,W,cv.CV_8U);T.push(inner);const pm=cv.matFromArray(4,1,cv.CV_32SC2,q.flatMap(p=>[Math.round(p.x),Math.round(p.y)]));T.push(pm);const mv=new cv.MatVector();T.push(mv);mv.push_back(pm);cv.fillPoly(inner,mv,new cv.Scalar(255));
-  const dil=new cv.Mat(),ring=new cv.Mat(),nm=new cv.Mat();T.push(dil,ring,nm);cv.dilate(inner,dil,k21,new cv.Point(-1,-1),1);cv.subtract(dil,inner,ring,nm,-1);
-  const mi=cv.mean(enh,inner)[0],mo=cv.countNonZero(ring)>0?cv.mean(enh,ring)[0]:mi;return .6+clamp((mi-mo)/80,0,1)*.8}finally{T.forEach(m=>{try{m.delete()}catch(e){}})}}
-
-/* ===================== 四隅の自動検出 =====================
-   検出用コピーだけコントラストを強調（CLAHE）して輪郭を探す。
-   補正は元画像に対して行うため、「コントラストを戻す」処理は不要。 */
+/* ===================== 四隅の自動検出（V11.1） =====================
+   1) 検出用コピーをメディアンぼかし → 木目・布目などの細かい模様を消す（文字・紙の縁は残る）
+   2) 候補を2系統で作る
+      A: 輪郭（エッジ／明るさ）を四角形に近似
+      B: 直線検出（Hough）で長い縦線2本×横線2本の組み合わせ → 指で角や辺が隠れても線を延長して角を復元
+   3) すべての候補を「4辺が実際の紙の縁（エッジ）にどれだけ乗っているか」で採点し、最高点を採用
+   補正は元画像に対して行うため、コントラストを「戻す」処理は不要 */
+function orderArr(p){return orderQuad(p.map(a=>({x:a[0],y:a[1]})))}
 function detectQuad(cv){const T=[],K=m=>{T.push(m);return m};
-  try{const S=E.source,k=Math.min(1,900/Math.max(S.width,S.height));
+  try{const S=E.source,k=Math.min(1,700/Math.max(S.width,S.height));
     const src=K(cv.imread(S)),small=K(new cv.Mat());cv.resize(src,small,new cv.Size(Math.max(1,Math.round(S.width*k)),Math.max(1,Math.round(S.height*k))),0,0,cv.INTER_AREA);
-    const W=small.cols,H=small.rows,imgA=W*H,P=new cv.Point(-1,-1);
-    const rgb=K(new cv.Mat()),gray=K(new cv.Mat()),enh=K(new cv.Mat()),blur=K(new cv.Mat());
-    cv.cvtColor(small,rgb,cv.COLOR_RGBA2RGB);cv.cvtColor(rgb,gray,cv.COLOR_RGB2GRAY);
-    // ① コントラスト強調（局所的なヒストグラム平坦化）
-    try{const cl=new cv.CLAHE(3,new cv.Size(8,8));cl.apply(gray,enh);cl.delete()}catch(e){cv.equalizeHist(gray,enh)}
-    cv.GaussianBlur(enh,blur,new cv.Size(5,5),0);
-    // ② 「白さ」マップ＝明るさ－彩度。紙は高く、指（肌色）や色付き背景は低くなる
-    const hsv=K(new cv.Mat()),ch=K(new cv.MatVector());cv.cvtColor(rgb,hsv,cv.COLOR_RGB2HSV);cv.split(hsv,ch);
-    const sat=K(ch.get(1)),val=K(ch.get(2)),white=K(new cv.Mat()),nm=K(new cv.Mat());cv.subtract(val,sat,white,nm,-1);cv.GaussianBlur(white,white,new cv.Size(7,7),0);
-    const k5=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(5,5))),k15=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(15,15))),k21=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(21,21)));
-    const sources=[];
-    // 方式A：エッジ（しきい値を3段階で試す）
-    const med=medianOf(blur.data);
-    for(const[lo,hi]of[[Math.max(10,med*.66),Math.min(255,Math.max(40,med*1.33))],[25,90],[60,180]]){const e=K(new cv.Mat());cv.Canny(blur,e,lo,hi);cv.morphologyEx(e,e,cv.MORPH_CLOSE,k5,P,2);cv.dilate(e,e,k5,P,1);sources.push({m:e,wt:.95})}
-    // 方式B：白さマップを自動二値化（指・複雑な背景に強い）
-    const mW=K(new cv.Mat());cv.threshold(white,mW,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);cv.morphologyEx(mW,mW,cv.MORPH_OPEN,k5,P,1);cv.morphologyEx(mW,mW,cv.MORPH_CLOSE,k15,P,2);sources.push({m:mW,wt:1.05});
-    // 方式C：コントラスト強調後の明るさを自動二値化
-    const mB=K(new cv.Mat());cv.threshold(blur,mB,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);cv.morphologyEx(mB,mB,cv.MORPH_OPEN,k5,P,1);cv.morphologyEx(mB,mB,cv.MORPH_CLOSE,k15,P,2);sources.push({m:mB,wt:1});
-    // 候補収集
+    const W=small.cols,H=small.rows,A=W*H,P=new cv.Point(-1,-1);
+    const gray=K(new cv.Mat()),med=K(new cv.Mat()),gb=K(new cv.Mat());
+    cv.cvtColor(small,gray,cv.COLOR_RGBA2GRAY);cv.medianBlur(gray,med,7);cv.GaussianBlur(med,gb,new cv.Size(5,5),0);
+    const k3=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(3,3))),k5=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(5,5))),k15=K(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(15,15)));
+    // 採点用エッジマップ
+    const edge=K(new cv.Mat()),sup=K(new cv.Mat());cv.Canny(gb,edge,30,90);cv.dilate(edge,sup,k5,P,1);const SD=sup.data;
     const cands=[];
-    for(const s of sources){const cs=K(new cv.MatVector()),hi=K(new cv.Mat());cv.findContours(s.m,cs,hi,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
-      for(let i=0;i<cs.size();i++){const c=cs.get(i),a=Math.abs(cv.contourArea(c));if(a>imgA*.04){for(const q of quadCandidates(cv,c,W,H))cands.push({...q,area:a,wt:s.wt})}c.delete()}}
-    // 形状で一次評価 → 上位だけ明暗差で二次評価
-    const scored=cands.map(c=>({...c,g:geomScore(c,imgA)})).filter(c=>c.g>0).sort((a,b)=>b.g-a.g).slice(0,12);
-    let best=null;for(const c of scored){const sc=c.g*contrastFactor(cv,c.pts,enh,k21);if(!best||sc>best.score)best={...c,score:sc}}
-    if(!best)return null;const inv=1/k;
-    return{pts:best.pts.map(p=>({x:clamp(p.x*inv,0,S.width-1),y:clamp(p.y*inv,0,S.height-1)})),kind:best.kind};
+    // ---- A: 輪郭候補 ----
+    const masks=[];
+    for(const[lo,hi]of[[30,90],[60,180],[15,50]]){const e=K(new cv.Mat());cv.Canny(gb,e,lo,hi);cv.morphologyEx(e,e,cv.MORPH_CLOSE,k5,P,2);cv.dilate(e,e,k3,P,1);masks.push(e)}
+    const mb=K(new cv.Mat());cv.threshold(gb,mb,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);cv.morphologyEx(mb,mb,cv.MORPH_OPEN,k5,P,1);cv.morphologyEx(mb,mb,cv.MORPH_CLOSE,k15,P,2);masks.push(mb);
+    for(const m of masks){const cs=K(new cv.MatVector()),hi=K(new cv.Mat());cv.findContours(m,cs,hi,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+      for(let i=0;i<cs.size();i++){const c=cs.get(i);if(Math.abs(cv.contourArea(c))>=A*.04){const h=new cv.Mat();cv.convexHull(c,h,false,true);const per=cv.arcLength(h,true);
+          for(const eps of[.01,.02,.03,.045,.065]){const ap=new cv.Mat();cv.approxPolyDP(h,ap,eps*per,true);if(ap.rows===4)cands.push(orderQuad(contourPoints(ap)));ap.delete()}h.delete()}c.delete()}}
+    // ---- B: 直線候補 ----
+    const lines=K(new cv.Mat());cv.HoughLines(edge,lines,1,Math.PI/180,Math.max(20,Math.round(Math.min(W,H)*.12)),0,0,0,Math.PI);
+    const hs=[],vs=[],ld=lines.data32F,c40=Math.cos(40*Math.PI/180),d6=6*Math.PI/180;
+    for(let i=0;i<Math.min(lines.rows,150);i++){let r=ld[i*2],t=ld[i*2+1];if(r<0){r=-r;t-=Math.PI}
+      const g=Math.abs(Math.sin(t))>c40?hs:(Math.abs(Math.cos(t))>c40?vs:null);if(!g||g.length>=12)continue;
+      if(g.some(([r2,t2])=>Math.abs(r-r2)<12&&Math.abs(t-t2)<d6))continue;g.push([r,t])}
+    const inter=(l1,l2)=>{const a=Math.cos(l1[1]),b=Math.sin(l1[1]),c=Math.cos(l2[1]),d=Math.sin(l2[1]),det=a*d-b*c;if(Math.abs(det)<1e-6)return null;return[(l1[0]*d-b*l2[0])/det,(a*l2[0]-l1[0]*c)/det]};
+    const inside=p=>p&&p[0]>=-W*.05&&p[0]<=W*1.05&&p[1]>=-H*.05&&p[1]<=H*1.05;
+    for(let i=0;i<hs.length;i++)for(let j=i+1;j<hs.length;j++)for(let a=0;a<vs.length;a++)for(let b=a+1;b<vs.length;b++){
+      const pts=[inter(hs[i],vs[a]),inter(hs[i],vs[b]),inter(hs[j],vs[a]),inter(hs[j],vs[b])];if(!pts.every(inside))continue;
+      cands.push(orderArr(pts.map(p=>[clamp(p[0],0,W-1),clamp(p[1],0,H-1)])))}
+    // ---- 採点 ----
+    const support=q=>{let sum=0,mn=1;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4];let hit=0;const n=60;
+        for(let s=0;s<n;s++){const t=.04+.92*s/(n-1),x=Math.round(a.x+(b.x-a.x)*t),y=Math.round(a.y+(b.y-a.y)*t);if(x>=0&&x<W&&y>=0&&y<H&&SD[y*W+x])hit++}
+        const f=hit/n;sum+=f;mn=Math.min(mn,f)}return .7*sum/4+.3*mn};
+    const mg=Math.min(W,H)*.015,bpen=[1,.9,.6,.45,.35];
+    const score=q=>{if(!isConvex(q))return-1;const r=polyArea(q)/A;if(r<.05||r>.97)return-1;let cs=0,cm=0;
+      for(let i=0;i<4;i++){const p=q[(i+3)%4],o=q[i],n=q[(i+1)%4],v1x=p.x-o.x,v1y=p.y-o.y,v2x=n.x-o.x,v2y=n.y-o.y,v=Math.abs((v1x*v2x+v1y*v2y)/((Math.hypot(v1x,v1y)*Math.hypot(v2x,v2y))||1));cs+=v;cm=Math.max(cm,v)}
+      if(cm>.5)return-1;const nb=q.filter(p=>p.x<mg||p.y<mg||p.x>W-1-mg||p.y>H-1-mg).length,s=support(q);
+      return s*s*Math.sqrt(r)*(1-cs/4)*bpen[nb]};
+    let best=null,bs=0;for(const q of cands){const s=score(q);if(s>bs){bs=s;best=q}}
+    console.info('detectQuad',{cands:cands.length,h:hs.length,v:vs.length,score:bs});
+    if(!best||bs<.03)return null;const inv=1/k;
+    return{pts:best.map(p=>({x:clamp(p.x*inv,0,S.width-1),y:clamp(p.y*inv,0,S.height-1)})),kind:'approx'};
   }finally{T.forEach(m=>{try{m.delete()}catch(e){}})}}
 
 E.auto.addEventListener('click',async()=>{
@@ -129,7 +120,7 @@ E.auto.addEventListener('click',async()=>{
   try{const cv=await getCv();status('コントラストを強調して四隅を探索中',true,35);await nextFrame();
     const r=detectQuad(cv);
     if(r){corners=r.pts;E.rotation.value=0;updateLabels();status('補正中',true,75);await applyCorners(true);setView('result');
-      status(r.kind==='approx'?'自動スキャンが完了しました。ずれている場合は「① 四隅を調整」で直せます':'隠れた角を推定してスキャンしました。「① 四隅を調整」で確認してください')}
+      status('自動スキャンが完了しました。ずれている場合は「① 四隅を調整」で直せます')}
     else{corners=fullCorners();setView('edit');status('四隅を自動検出できませんでした。●をドラッグして角に合わせてください')}
   }catch(e){console.error(e);status('自動スキャンに失敗しました: '+e.message)}finally{busy=false;buttons();drawEditor()}
 });
