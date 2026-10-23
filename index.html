@@ -46,7 +46,7 @@
     .app {
       max-width: 1180px;
       margin: auto;
-      padding: 28px 18px 100px
+      padding: 28px 18px 40px
     }
 
     .head {
@@ -302,16 +302,10 @@
     }
 
     .status {
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      width: min(850px, calc(100% - 28px));
-      background: #1e293bf2;
+      background: #1e293b;
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 12px 14px;
-      z-index: 10;
       box-shadow: 0 8px 24px #0006
     }
 
@@ -437,7 +431,7 @@
       }
 
       .app {
-        padding: 18px 12px 110px
+        padding: 18px 12px 40px
       }
 
       .btn,
@@ -455,10 +449,6 @@
 
       .preview {
         max-height: 62vh
-      }
-
-      .status {
-        bottom: max(12px, env(safe-area-inset-bottom))
       }
     }
   </style>
@@ -485,6 +475,12 @@
           hidden></canvas>
       </section>
       <aside class="side">
+      <div class="status">
+        <div class="statusline"><span id="dot" class="dot"></span><span id="message">画像を選択してください</span></div>
+        <div id="bar" class="bar">
+          <div id="fill" class="fill"></div>
+        </div>
+      </div>
         <section class="card">
           <h2 class="title">▣ 画像補正</h2>
           <button id="auto" class="btn primary" disabled>✨ 自動スキャン（四隅を自動検出）</button>
@@ -517,12 +513,6 @@
         autocomplete="off">
       <div class="dialog-actions"><button id="cancelPdf" class="btn outline">キャンセル</button><button id="savePdf"
           class="btn green">PDF保存</button></div>
-    </div>
-  </div>
-  <div class="status">
-    <div class="statusline"><span id="dot" class="dot"></span><span id="message">画像を選択してください</span></div>
-    <div id="bar" class="bar">
-      <div id="fill" class="fill"></div>
     </div>
   </div>
   <script>
