@@ -718,7 +718,7 @@
 
     E.tabEdit.addEventListener('click', () => setView('edit'));
     E.tabResult.addEventListener('click', () => setView('result'));
-    E.applyCorners.addEventListener('click', async () => {status('補正中', true, 50); const ok = await applyCorners(true); busy = false; if (ok) {setView('result'); status('四隅の位置で補正しました')} else status('補正できませんでした。四隅の位置を確認してください')});
+    E.applyCorners.addEventListener('click', async () => {status('補正中', true, 50); const ok = await applyCorners(true); busy = false; if (ok) {setView('result'); status('四隅の位置で補正しました。再度補正するには「① 四隅を調整」を押してください。')} else status('補正できませんでした。四隅の位置を確認してください')});
     E.fullCorners.addEventListener('click', () => {corners = fullCorners(); requestDraw(); buttons(); applyCorners(true).then(() => status('四隅を画像全体に戻しました'))});
 
     /* ===================== PDF保存（V10と同じ） ===================== */
