@@ -14,7 +14,7 @@
   <link rel="icon" href="./favicon.ico?v=14" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png?v=14">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png?v=14">
-  <title>レシートスキャナー V14.1</title>
+  <title>レシートスキャナー V14.2</title>
   <style>
     /* 配色ルール 60-30-10
        60%（ベース）：--bg / --panel …ネイビー（パレットの #1E293B とその濃淡）
@@ -64,9 +64,14 @@
     .head {
       display: flex;
       justify-content: space-between;
-      gap: 18px;
-      align-items: end;
+      align-items: center;
+      gap: 24px;
       margin-bottom: 22px
+    }
+
+    .head .status {
+      width: min(460px, 45%);
+      flex: none
     }
 
     .eyebrow {
@@ -474,7 +479,7 @@
   <main class="app">
     <header class="head">
       <div>
-        <div class="eyebrow">DOC TO PDF V14.1</div>
+        <div class="eyebrow">DOC TO PDF V14.2</div>
         <h1>書類スキャナー</h1>
       </div>
     </header>
@@ -764,7 +769,18 @@
     E.resetAll.addEventListener('click', () => {if (sourceUrl) URL.revokeObjectURL(sourceUrl); sourceUrl = ''; currentUrl = ''; corners = null; drag = null; E.preview.removeAttribute('src'); E.empty.hidden = false; E.pick.hidden = false; E.file.value = ''; resetValues(); setView('edit'); E.edit.classList.remove('show'); status('画像を選択してください')});
     if ('serviceWorker' in navigator) {window.addEventListener('load', async () => {try {await navigator.serviceWorker.register('./service-worker.js'); await navigator.serviceWorker.ready; if (navigator.onLine) status('PWAの準備が完了しました。写真アプリから画像を選択できます'); else status('オフラインで起動しました')} catch (e) {console.error(e); status('PWA登録に失敗しました。HTTPSで公開されているか確認してください')} })} else {status('このブラウザはオフラインPWAに対応していません')}
     window.addEventListener('offline', () => status('オフラインになりました。保存済み機能は利用できます')); window.addEventListener('online', () => status('オンラインに戻りました')); updateLabels(); buttons();
-  </script>
+      // ステータス表示：PCはヘッダー右、スマホは「画像補正」の上
+      const statusBox = document.querySelector('.status'),
+        headBox = document.querySelector('.head'),
+        sideBox = document.querySelector('.side'),
+        pcMedia = window.matchMedia('(min-width: 851px)');
+      function placeStatus() {
+        if (pcMedia.matches) headBox.appendChild(statusBox);
+        else sideBox.prepend(statusBox);
+      }
+      pcMedia.addEventListener('change', placeStatus);
+      placeStatus();
+    </script>
 </body>
 
 </html>
