@@ -1,5 +1,5 @@
 // ===== キャッシュ名（index.html などを更新したら、毎回ここを上げる） =====
-const CACHE = 'receipt-scanner-v14-3';
+const CACHE = 'receipt-scanner-v14-4';
 
 // ===== 端末に保存するファイル一覧 =====
 // index.html の <link> と「?v=14」まで完全に同じ文字にすること
