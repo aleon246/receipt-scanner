@@ -14,7 +14,7 @@
   <link rel="icon" href="./favicon.ico?v=14" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png?v=14">
   <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png?v=14">
-  <title>レシートスキャナー V14.2</title>
+  <title>レシートスキャナー V14.3</title>
   <style>
     /* 配色ルール 60-30-10
        60%（ベース）：--bg / --panel …ネイビー（パレットの #1E293B とその濃淡）
@@ -88,6 +88,17 @@
     h1 {
       margin: 5px 0;
       font-size: clamp(26px, 4vw, 40px)
+    }
+
+    /* タイトル右のサブコピー */
+    .tagline {
+      display: inline-block;
+      margin-left: 16px;
+      font-size: clamp(13px, 1.4vw, 17px);
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .04em;
+      vertical-align: middle
     }
 
     .sub,
@@ -438,6 +449,12 @@
     }
 
     @media(max-width:850px) {
+      .tagline {
+        display: block;
+        margin: 6px 0 0;
+        font-size: 14px
+      }
+
       .head {
         align-items: start;
         flex-direction: column
@@ -479,8 +496,8 @@
   <main class="app">
     <header class="head">
       <div>
-        <div class="eyebrow">DOC TO PDF V14.2</div>
-        <h1>書類スキャナー</h1>
+        <div class="eyebrow">DOC TO PDF V14.3</div>
+        <h1>書類スキャナー<span class="tagline">書類をスキャン &amp; PDFで保存</span></h1>
       </div>
     </header>
     <div class="grid">
